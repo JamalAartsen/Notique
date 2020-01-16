@@ -5,15 +5,32 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val notes: MutableList<Note> = ArrayList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.setHasFixedSize(true)
+        val itemDecoration = ItemOffsetDecoration(this, R.dimen.space_item_list)
+        recyclerView.addItemDecoration(itemDecoration)
+        val adapter = NoteAdapter(notes)
+        recyclerView.adapter = adapter
+
+        notes.add(Note(0, "Jamal", "Hallo ik ben Jamal"))
+        notes.add(Note(0, "Jamal", "Hallo ik ben Jamal"))
+        notes.add(Note(0, "Jamal", "Hallo ik ben Jamal"))
+        notes.add(Note(0, "Jamal", "Hallo ik ben Jamal"))
 
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)

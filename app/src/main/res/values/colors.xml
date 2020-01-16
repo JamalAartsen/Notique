@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#C39E3A</color>
     <color name="colorAccent">#D2B25B</color>
     <color name="backGroundColorActivity">#EAD8A1</color>
+    <color name="background_cardview">#F0E5C4</color>
+    <color name="black">#000000</color>
 </resources>
