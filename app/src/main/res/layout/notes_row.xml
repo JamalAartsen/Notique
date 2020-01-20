@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:card_view="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+    android:layout_margin="5dp"
 app:cardCornerRadius="2dp"
 android:backgroundTint="@color/background_cardview">
 <!--app:strokeColor="@color/cardview_borderline_color"-->
@@ -43,4 +44,4 @@ android:backgroundTint="@color/background_cardview">
         </RelativeLayout>
 
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+</androidx.cardview.widget.CardView>
