@@ -1,5 +1,6 @@
 package com.example.quicknote
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
@@ -39,11 +40,8 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         recyclerView.adapter = NoteAdapter(notes, this)
 
         fab.setOnClickListener { view ->
-            count++
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-            insertNote(Note(count, "Hello", "Ik ben Jamal"))
-            Log.d("Count", "$count")
+            val intentAddNote = Intent(this, AddNote::class.java)
+            startActivity(intentAddNote)
         }
 
         //Delete item with long click on the item
