@@ -1,5 +1,6 @@
 package com.example.quicknote
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 @Dao
@@ -18,5 +19,5 @@ interface NoteDao {
     fun deleteAllNotes()
 
     @Query("SELECT * FROM note_table")
-    fun getAllNotes(): List<Note>
+    fun getAllNotes(): LiveData<List<Note>>
 }

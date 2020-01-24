@@ -1,5 +1,6 @@
 package com.example.quicknote
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,24 +10,27 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_add_note.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
-class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
+class MainActivity : AppCompatActivity() {
+
+    companion object {
+        val REQUESTCODE = 1
+    }
 
     private var notes: List<Note> = ArrayList()
     var db = NoteRoomDatabase
-    private val executor: Executor =
-        Executors.newSingleThreadExecutor()
     private var noteAdapter: NoteAdapter? = null
-    private var mGestureDetector: GestureDetector? = null
-    var count = 3
+    private lateinit var noteViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,40 +43,15 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
         recyclerView.adapter = NoteAdapter(notes, this)
 
-        fab.setOnClickListener { view ->
-            val intentAddNote = Intent(this, AddNote::class.java)
-            startActivity(intentAddNote)
-        }
-
-        //Delete item with long click on the item
-        mGestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
-            override fun onLongPress(e: MotionEvent) {
-                super.onLongPress(e)
-                val child = recyclerView.findChildViewUnder(e.x, e.y)
-                if (child != null) {
-                    val adapterPosition = recyclerView.getChildAdapterPosition(child)
-                    deleteNote(notes[adapterPosition])
-                }
-            }
+        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+        noteViewModel.allNotes.observe(this, Observer<List<Note>> { notes ->
+            this.notes = notes
+            updateUI()
         })
 
-        recyclerView.addOnItemTouchListener(this)
-        getAllNotes()
-    }
-
-    fun getAllNotes() {
-        executor.execute {
-            notes = db.getDatabase(this).noteDao().getAllNotes()
-            runOnUiThread {
-                updateUI()
-            }
-        }
-    }
-
-    fun insertNote(note: Note) {
-        executor.execute {
-            db.getDatabase(this).noteDao().insert(note)
-            getAllNotes()
+        fab.setOnClickListener {
+            val intentAddNote = Intent(this, AddNote::class.java)
+            startActivityForResult(intentAddNote, REQUESTCODE)
         }
     }
 
@@ -82,13 +61,6 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
             recyclerView.adapter = noteAdapter
         } else {
             noteAdapter?.swapList(notes)
-        }
-    }
-
-    fun deleteNote(note: Note) {
-        executor.execute {
-            db.getDatabase(this).noteDao().delete(note)
-            getAllNotes()
         }
     }
 
@@ -108,16 +80,15 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         }
     }
 
-    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
 
-    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-        mGestureDetector?.onTouchEvent(e)
-        return false
-    }
+        if (requestCode == REQUESTCODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                val note: Note? = data?.getParcelableExtra(SEND_NOTE_DATA)
 
-    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                note?.let { noteViewModel.insert(it) }
+            }
+        }
     }
 }
