@@ -6,36 +6,48 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_add_note.*
-import kotlinx.android.synthetic.main.content_add_note.*
+import kotlinx.android.synthetic.main.activity_edit_note.*
+import kotlinx.android.synthetic.main.content_edit_note.*
 
-class AddNote : AppCompatActivity() {
+class EditNote : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_note)
+        setContentView(R.layout.activity_edit_note)
         setSupportActionBar(toolbar)
 
+        val note = intent.getParcelableExtra<Note?>(SEND_DATA_EDIT_NOTE)
+        if (note != null) {
+            title_edit_note.setText(note.titleNote)
+            description_edit_note.setText(note.descriptionNote)
+        }
+
         fab.setOnClickListener {
-            val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString())
-            val intentSendData = Intent(this, MainActivity::class.java).apply {
-                putExtra(SEND_NOTE_DATA, note)
+
+            note?.apply {
+                titleNote = title_edit_note.text.toString()
+                descriptionNote = description_edit_note.text.toString()
             }
 
-            setResult(Activity.RESULT_OK, intentSendData)
+            val editIntent = Intent(this, MainActivity::class.java).apply {
+                putExtra(SEND_EDITED_NOTE, note)
+            }
+
+            setResult(Activity.RESULT_OK, editIntent)
             finish()
         }
     }
 
     fun shareData() {
         val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_SUBJECT, title_add_note.text.toString())
-            putExtra(Intent.EXTRA_TEXT, description_add_note.text.toString())
+            action = Intent.ACTION_SEND_MULTIPLE
+            putExtra(Intent.EXTRA_SUBJECT, title_edit_note.text.toString())
+            putExtra(Intent.EXTRA_TEXT, description_edit_note.text.toString())
             type = "text/plain"
         }
 
-        startActivity(Intent.createChooser(sendIntent, getString(R.string.deel_note)))
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(shareIntent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "note_table")
 data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
-                @ColumnInfo(name = "title_note") val titleNote: String?,
-                @ColumnInfo(name = "description_note") val descriptionNote: String?): Parcelable {
+                @ColumnInfo(name = "title_note") var titleNote: String?,
+                @ColumnInfo(name = "description_note") var descriptionNote: String?): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),

@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:card_view="http://schemas.android.com/tools"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_margin="5dp"
-app:cardCornerRadius="2dp"
-android:backgroundTint="@color/background_cardview">
-<!--app:strokeColor="@color/cardview_borderline_color"-->
-<!--app:strokeWidth="1dp">-->
+    android:backgroundTint="@color/background_cardview"
+    android:orientation="vertical"
+    app:cardCornerRadius="2dp">
+    <!--app:strokeColor="@color/cardview_borderline_color"-->
+    <!--app:strokeWidth="1dp">-->
 
 
     <LinearLayout
-            android:id="@+id/cardView"
-            android:layout_width="match_parent"
-            android:layout_height="150dp">
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:layout_height="150dp">
 
         <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="16dp">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
 
             <TextView
-                    android:id="@+id/titleNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_alignParentTop="true"
-                    android:text="Title"
-                    android:textSize="20dp"
-                    android:textColor="@color/black"
-            />
+                android:id="@+id/titleNote"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:text="Title"
+                android:textColor="@color/black"
+                android:textSize="20dp" />
 
             <TextView
-                    android:id="@+id/descriptionNote"
-                    android:layout_width="match_parent"
-                    android:layout_height="70dp"
-                    android:text="Description"
-                    android:layout_below="@+id/titleNote"
-                    android:textColor="@color/black"
-            />
+                android:id="@+id/descriptionNote"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_below="@+id/titleNote"
+                android:text="Description"
+                android:textColor="@color/black" />
 
 
         </RelativeLayout>

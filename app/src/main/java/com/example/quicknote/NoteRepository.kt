@@ -11,9 +11,21 @@ class NoteRepository(private val noteDao: NoteDao) {
 
     val allNote: LiveData<List<Note>> = noteDao.getAllNotes()
 
-     fun insert(note: Note) {
-         mExecutor.execute {
-             noteDao.insert(note)
-         }
+    fun insert(note: Note) {
+        mExecutor.execute {
+            noteDao.insert(note)
+        }
+    }
+
+    fun update(note: Note) {
+        mExecutor.execute {
+            noteDao.update(note)
+        }
+    }
+
+    fun delete(note: Note) {
+        mExecutor.execute {
+            noteDao.delete(note)
+        }
     }
 }
