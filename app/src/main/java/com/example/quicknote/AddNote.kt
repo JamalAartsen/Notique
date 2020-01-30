@@ -16,6 +16,11 @@ class AddNote : AppCompatActivity() {
         setContentView(R.layout.activity_add_note)
         setSupportActionBar(toolbar)
 
+        if (supportActionBar != null) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowHomeEnabled(true)
+        }
+
         fab.setOnClickListener {
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString())
             val intentSendData = Intent(this, MainActivity::class.java).apply {
@@ -27,23 +32,14 @@ class AddNote : AppCompatActivity() {
         }
     }
 
-    fun shareData() {
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_SUBJECT, title_add_note.text.toString())
-            putExtra(Intent.EXTRA_TEXT, description_add_note.text.toString())
-            type = "text/plain"
-        }
-
-        startActivity(Intent.createChooser(sendIntent, getString(R.string.deel_note)))
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.findItem(R.id.action_search).apply {
-            isVisible = false
-        }
+
+        hideIcon(R.id.action_search, menu)
+        hideIcon(R.id.action_delete_notes, menu)
+        hideIcon(R.id.action_filter_list, menu)
+
         return true
     }
 
@@ -52,7 +48,16 @@ class AddNote : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         if (item.itemId == R.id.action_share) {
-            shareData()
+            shareData(
+                title_add_note.text.toString(),
+                description_add_note.text.toString(),
+                this
+            )
+            return true
+        }
+
+        if (item.itemId == android.R.id.home) {
+            finish()
             return true
         }
 

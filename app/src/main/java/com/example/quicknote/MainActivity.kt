@@ -1,32 +1,39 @@
 package com.example.quicknote
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.GestureDetector
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
-import android.widget.SearchView
+
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
-    private var notes: List<Note> = ArrayList()
+    private var notes: MutableList<Note> = ArrayList()
     var db = NoteRoomDatabase
     private var noteAdapter: NoteAdapter? = null
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var gestureDetector: GestureDetector
     private var modifyPosition = 0
+    private lateinit var items: ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +42,13 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
         db.getDatabase(this)
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager =
+            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
         recyclerView.adapter = NoteAdapter(notes, this)
 
         noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-        noteViewModel.allNotes.observe(this, Observer<List<Note>> { notes ->
+        noteViewModel.allNotes.observe(this, Observer<MutableList<Note>> { notes ->
             this.notes = notes
             updateUI()
         })
@@ -55,6 +63,10 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                 return true
             }
         })
+
+        sortButton.setOnClickListener {
+            showFilterDialog()
+        }
 
         recyclerView.addOnItemTouchListener(this)
     }
@@ -75,6 +87,23 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
             isVisible = false // Hide item for this activity
         }
 
+        val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as SearchView
+
+        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
+
+        searchView.setOnQueryTextListener(object :
+            SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                return false
+            }
+        })
+
         return true
     }
 
@@ -82,10 +111,12 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_search -> true
-            else -> super.onOptionsItemSelected(item)
+        if (item.itemId == R.id.action_delete_notes) {
+            popUpDialogDeleteAllNotes()
+            return true
         }
+
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -131,5 +162,71 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun sortNotes(item: String) {
+        if (item == getString(R.string.ascending)) {
+            notes.sortWith(Comparator { o1, o2 ->
+                o1.titleNote.toString().compareTo(o2.titleNote.toString())
+            })
+
+            updateUI()
+        } else if (item == getString(R.string.descending)) {
+            notes.sortWith(Comparator { o1, o2 ->
+                o2.titleNote.toString().compareTo(o1.titleNote.toString())
+            })
+            updateUI()
+        }
+        val jamal = notes.sortedWith(Comparator { o1, o2 ->
+            o1.titleNote.toString().compareTo(o2.titleNote.toString())
+        })
+
+        Log.d("Sorted", "$jamal")
+    }
+
+    fun popUpDialogDeleteAllNotes() {
+        val builder = AlertDialog.Builder(this).apply {
+            setMessage("Are you sure you want to delete all your notes?")
+            setCancelable(true)
+            setPositiveButton(
+                "Yes"
+            ) { dialog, id ->
+                noteViewModel.deleteAllNotes()
+                dialog.cancel()
+            }
+            setNegativeButton(
+                "No"
+            ) { dialog, id -> dialog.cancel() }
+        }
+
+        builder.create().apply {
+            show()
+        }
+    }
+
+    fun showFilterDialog() {
+        val alertDialog = AlertDialog.Builder(this).apply {
+            setTitle("Sort By")
+            setIcon(R.drawable.ic_filter_list)
+            setSingleChoiceItems(
+                R.array.filter_notes,
+                -1
+            ) { dialog, which ->
+                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending))
+                if (which == 0) {
+                    sortNotes(items[which])
+                } else if (which == 1) {
+                    sortNotes(items[which])
+                }
+            }
+
+            setPositiveButton(
+                "OK"
+            ) { dialog, _ -> dialog.cancel() }
+        }
+
+        alertDialog.create().apply {
+            show()
+        }
     }
 }

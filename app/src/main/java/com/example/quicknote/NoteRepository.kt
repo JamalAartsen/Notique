@@ -9,7 +9,7 @@ class NoteRepository(private val noteDao: NoteDao) {
     private val mExecutor: Executor =
         Executors.newSingleThreadExecutor()
 
-    val allNote: LiveData<List<Note>> = noteDao.getAllNotes()
+    val allNote: LiveData<MutableList<Note>> = noteDao.getAllNotes()
 
     fun insert(note: Note) {
         mExecutor.execute {
@@ -26,6 +26,13 @@ class NoteRepository(private val noteDao: NoteDao) {
     fun delete(note: Note) {
         mExecutor.execute {
             noteDao.delete(note)
+        }
+    }
+
+    fun deleteAllNotes() {
+        mExecutor.execute {
+            noteDao.deleteAllNotes()
+            allNote
         }
     }
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData
 class NoteViewModel(application: Application): AndroidViewModel(application) {
 
     private val repository: NoteRepository
-    val allNotes: LiveData<List<Note>>
+    val allNotes: LiveData<MutableList<Note>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
@@ -25,5 +25,9 @@ class NoteViewModel(application: Application): AndroidViewModel(application) {
 
     fun delete(note: Note) {
         repository.delete(note)
+    }
+
+    fun deleteAllNotes() {
+        repository.deleteAllNotes()
     }
 }

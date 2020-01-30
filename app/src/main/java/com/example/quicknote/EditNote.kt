@@ -16,6 +16,11 @@ class EditNote : AppCompatActivity() {
         setContentView(R.layout.activity_edit_note)
         setSupportActionBar(toolbar)
 
+        if (supportActionBar != null) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowHomeEnabled(true)
+        }
+
         val note = intent.getParcelableExtra<Note?>(SEND_DATA_EDIT_NOTE)
         if (note != null) {
             title_edit_note.setText(note.titleNote)
@@ -38,24 +43,14 @@ class EditNote : AppCompatActivity() {
         }
     }
 
-    fun shareData() {
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND_MULTIPLE
-            putExtra(Intent.EXTRA_SUBJECT, title_edit_note.text.toString())
-            putExtra(Intent.EXTRA_TEXT, description_edit_note.text.toString())
-            type = "text/plain"
-        }
-
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.findItem(R.id.action_search).apply {
-            isVisible = false
-        }
+        
+        hideIcon(R.id.action_search, menu)
+        hideIcon(R.id.action_delete_notes, menu)
+        hideIcon(R.id.action_filter_list, menu)
+
         return true
     }
 
@@ -64,7 +59,14 @@ class EditNote : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         if (item.itemId == R.id.action_share) {
-            shareData()
+            shareData(title_edit_note.text.toString(),
+                description_edit_note.text.toString(),
+                this)
+            return true
+        }
+
+        if (item.itemId == android.R.id.home) {
+            finish()
             return true
         }
 

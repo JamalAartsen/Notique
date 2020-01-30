@@ -8,8 +8,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.notes_row.view.*
 
-class NoteAdapter(var notes: List<Note>, val context: Context) :
+class NoteAdapter(var notes: MutableList<Note>, val context: Context) :
     RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
+
+    private val notesListSearch: MutableList<Note>
+
+    init {
+        notesListSearch = ArrayList(notes)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.notes_row, parent, false))
@@ -26,7 +32,7 @@ class NoteAdapter(var notes: List<Note>, val context: Context) :
         holder.noteDescription?.text = note.descriptionNote
     }
 
-    fun swapList(newList: List<Note>) {
+    fun swapList(newList: MutableList<Note>) {
         notes = newList
         notifyDataSetChanged()
     }

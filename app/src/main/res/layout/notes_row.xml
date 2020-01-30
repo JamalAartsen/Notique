@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:backgroundTint="@color/background_cardview"
@@ -15,31 +15,47 @@
     <LinearLayout
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:foreground="?android:attr/selectableItemBackground"
+        android:layout_height="150dp"
         android:clickable="true"
-        android:layout_height="150dp">
+        android:foreground="?android:attr/selectableItemBackground">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <TextView
-                android:id="@+id/titleNote"
+            <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_alignParentTop="true"
-                android:text="Title"
-                android:textColor="@color/black"
-                android:textSize="20dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/dot"
+                    android:layout_marginEnd="5dp"/>
+
+                <TextView
+                    android:id="@+id/titleNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_alignParentTop="true"
+                    android:text="Title"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/descriptionNote"
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
-                android:layout_below="@+id/titleNote"
+                android:layout_below="@+id/linearLayout"
                 android:text="Description"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                android:textSize="10sp"
+                android:textStyle="normal" />
 
 
         </RelativeLayout>
