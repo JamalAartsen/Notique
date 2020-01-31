@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.GestureDetector
@@ -13,7 +14,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
-
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
@@ -22,8 +22,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
     private lateinit var gestureDetector: GestureDetector
     private var modifyPosition = 0
     private lateinit var items: ArrayList<String>
+    lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,11 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         setSupportActionBar(toolbar)
 
         db.getDatabase(this)
+        sharedPreferences = getSharedPreferences("jamal", Context.MODE_PRIVATE)
+
+        // todo
+        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+        Log.d("Date", "$currentDate")
 
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager =
@@ -176,12 +184,18 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                 o2.titleNote.toString().compareTo(o1.titleNote.toString())
             })
             updateUI()
-        }
-        val jamal = notes.sortedWith(Comparator { o1, o2 ->
-            o1.titleNote.toString().compareTo(o2.titleNote.toString())
-        })
+        } else if (item == getString(R.string.date_newest)) {
+            notes.sortWith(Comparator { o1, o2 ->  o1.dateNote.toString().compareTo(o2.dateNote.toString())
+            })
 
-        Log.d("Sorted", "$jamal")
+            updateUI()
+        } else {
+            notes.sortWith(Comparator { o1, o2 ->  o2.dateNote.toString().compareTo(o1.dateNote.toString())
+            })
+
+            updateUI()
+        }
+
     }
 
     fun popUpDialogDeleteAllNotes() {
@@ -212,11 +226,12 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                 R.array.filter_notes,
                 -1
             ) { dialog, which ->
-                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending))
-                if (which == 0) {
-                    sortNotes(items[which])
-                } else if (which == 1) {
-                    sortNotes(items[which])
+                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending), getString(R.string.date_newest), getString(R.string.date_oldest))
+                when (which) {
+                    0 -> { sortNotes(items[which]) }
+                    1 -> { sortNotes(items[which]) }
+                    2 -> { sortNotes(items[which]) }
+                    3 -> { sortNotes(items[which]) }
                 }
             }
 

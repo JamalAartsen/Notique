@@ -9,9 +9,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "note_table")
 data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
                 @ColumnInfo(name = "title_note") var titleNote: String?,
-                @ColumnInfo(name = "description_note") var descriptionNote: String?): Parcelable {
+                @ColumnInfo(name = "description_note") var descriptionNote: String?,
+                @ColumnInfo(name = "date-note") var dateNote: String?): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
+        parcel.readString(),
         parcel.readString(),
         parcel.readString()
     ) {
@@ -21,6 +23,7 @@ data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
         parcel.writeInt(id)
         parcel.writeString(titleNote)
         parcel.writeString(descriptionNote)
+        parcel.writeString(dateNote)
     }
 
     override fun describeContents(): Int {

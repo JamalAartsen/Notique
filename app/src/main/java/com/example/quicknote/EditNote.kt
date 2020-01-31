@@ -8,6 +8,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.android.synthetic.main.content_edit_note.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EditNote : AppCompatActivity() {
 
@@ -27,11 +29,14 @@ class EditNote : AppCompatActivity() {
             description_edit_note.setText(note.descriptionNote)
         }
 
+        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+
         fab.setOnClickListener {
 
             note?.apply {
                 titleNote = title_edit_note.text.toString()
                 descriptionNote = description_edit_note.text.toString()
+                dateNote = currentDate
             }
 
             val editIntent = Intent(this, MainActivity::class.java).apply {

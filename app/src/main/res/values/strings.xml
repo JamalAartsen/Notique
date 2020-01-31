@@ -6,9 +6,13 @@
     <string name="deel_note">Deel jouw note</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
+    <string name="date_newest">DateNewest</string>
+    <string name="date_oldest">DateOldest</string>
 
     <string-array name="filter_notes">
         <item>Title: A-Z</item>
         <item>Title: Z-A</item>
+        <item>Date from newest</item>
+        <item>Date from oldest</item>
     </string-array>
 </resources>

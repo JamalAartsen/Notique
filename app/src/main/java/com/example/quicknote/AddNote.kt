@@ -8,6 +8,8 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_add_note.*
 import kotlinx.android.synthetic.main.content_add_note.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddNote : AppCompatActivity() {
 
@@ -21,8 +23,10 @@ class AddNote : AppCompatActivity() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
         }
 
+        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+
         fab.setOnClickListener {
-            val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString())
+            val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate)
             val intentSendData = Intent(this, MainActivity::class.java).apply {
                 putExtra(SEND_NOTE_DATA, note)
             }

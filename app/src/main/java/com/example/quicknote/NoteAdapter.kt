@@ -30,6 +30,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context) :
 
         holder.noteTitle?.text = note.titleNote
         holder.noteDescription?.text = note.descriptionNote
+        holder.noteDate?.text = note.dateNote
     }
 
     fun swapList(newList: MutableList<Note>) {
@@ -40,5 +41,6 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val noteTitle: TextView? = view.titleNote
         val noteDescription: TextView? = view.descriptionNote
+        val noteDate: TextView? = view.dateNote
     }
 }
