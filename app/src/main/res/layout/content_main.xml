@@ -9,17 +9,11 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <Button
-        android:id="@+id/sortButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_margin="5dp"
         android:layout_width="match_parent"
         android:scrollbars="vertical"
-        android:layout_below="@+id/sortButton"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" />

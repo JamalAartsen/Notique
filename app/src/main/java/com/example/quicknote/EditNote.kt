@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.android.synthetic.main.content_edit_note.*
@@ -39,12 +40,13 @@ class EditNote : AppCompatActivity() {
                 dateNote = currentDate
             }
 
-            val editIntent = Intent(this, MainActivity::class.java).apply {
+            val editIntent = Intent().apply {
                 putExtra(SEND_EDITED_NOTE, note)
             }
 
+            Toast.makeText(this, "Note is edited!", Toast.LENGTH_SHORT).show()
+
             setResult(Activity.RESULT_OK, editIntent)
-            finish()
         }
     }
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_add_note.*
 import kotlinx.android.synthetic.main.content_add_note.*
@@ -27,12 +28,13 @@ class AddNote : AppCompatActivity() {
 
         fab.setOnClickListener {
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate)
-            val intentSendData = Intent(this, MainActivity::class.java).apply {
+            val intentSendData = Intent().apply {
                 putExtra(SEND_NOTE_DATA, note)
             }
 
+            Toast.makeText(this, "Note is added!", Toast.LENGTH_SHORT).show()
+
             setResult(Activity.RESULT_OK, intentSendData)
-            finish()
         }
     }
 
@@ -52,11 +54,7 @@ class AddNote : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         if (item.itemId == R.id.action_share) {
-            shareData(
-                title_add_note.text.toString(),
-                description_add_note.text.toString(),
-                this
-            )
+            shareData(title_add_note.text.toString(), description_add_note.text.toString(), this)
             return true
         }
 

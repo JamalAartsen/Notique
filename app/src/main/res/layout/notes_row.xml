@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:backgroundTint="@color/background_cardview"
+    android:id="@+id/cardViewlayout"
     android:orientation="vertical"
     app:cardCornerRadius="2dp">
     <!--app:strokeColor="@color/cardview_borderline_color"-->
@@ -49,32 +50,43 @@
             </LinearLayout>
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_below="@id/linearLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@id/linearLayout"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/descriptionNote"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="50dp"
                     android:layout_below="@+id/linearLayout"
                     android:text="Description"
                     android:textColor="@color/black"
                     android:textSize="10sp"
                     android:textStyle="normal" />
 
-                <TextView
-                    android:id="@+id/dateNote"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_below="@id/descriptionNote"
-                    android:layout_alignParentTop="true"
-                    android:text="date"
-                    android:gravity="right"
-                    android:textColor="@color/black"
-                    android:textSize="10sp"
-                    android:textStyle="italic" />
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/delete_single_item"
+                        android:src="@drawable/ic_delete_single_item"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"/>
+
+                    <TextView
+                        android:id="@+id/dateNote"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:layout_below="@id/descriptionNote"
+                        android:layout_alignParentTop="true"
+                        android:gravity="right"
+                        android:text="date"
+                        android:textColor="@color/black"
+                        android:textSize="10sp"
+                        android:textStyle="italic" />
+                </LinearLayout>
             </LinearLayout>
 
 
