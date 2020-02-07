@@ -24,7 +24,7 @@ class AddNote : AppCompatActivity() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
         }
 
-        val currentDate: String = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
+        val currentDate: String = SimpleDateFormat(getString(R.string.date_format), Locale.getDefault()).format(Date())
 
         fab.setOnClickListener {
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate)
@@ -32,8 +32,7 @@ class AddNote : AppCompatActivity() {
                 putExtra(SEND_NOTE_DATA, note)
             }
 
-            Toast.makeText(this, "Note is added!", Toast.LENGTH_SHORT).show()
-
+            Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show()
             setResult(Activity.RESULT_OK, intentSendData)
         }
     }

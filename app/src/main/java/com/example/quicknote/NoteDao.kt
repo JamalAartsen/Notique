@@ -2,6 +2,7 @@ package com.example.quicknote
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.quicknote.Note
 
 @Dao
 interface NoteDao {

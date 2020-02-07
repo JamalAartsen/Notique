@@ -4,19 +4,26 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.notes_row.view.*
+import java.util.*
+import kotlin.collections.ArrayList
 
-class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onDeleteClickListener: OnDeleteClickListener) :
+class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onLongPresDelete: OnClickListener, var addDeleteNote: InsertDeleteNote) :
     RecyclerView.Adapter<NoteAdapter.ViewHolder>() {
 
     private val notesListSearch: MutableList<Note>
+    private val arraylist: ArrayList<Note>
+    private var deletedPosition: Int = 0
+    private var deletedNote: Note = Note(0, "", "", "")
 
     init {
         notesListSearch = ArrayList(notes)
+        arraylist = ArrayList<Note>()
+        arraylist.addAll(notes)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -33,11 +40,23 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onDele
         holder.noteTitle?.text = note.titleNote
         holder.noteDescription?.text = note.descriptionNote
         holder.noteDate?.text = note.dateNote
-        holder.noteDeleteImage?.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                onDeleteClickListener.onDeleteClick(holder.adapterPosition)
+
+        holder.cardView?.setOnLongClickListener {
+            deletedPosition = holder.adapterPosition
+            deletedNote = notes[holder.adapterPosition]
+
+            onLongPresDelete.onLongPressDelete(holder.adapterPosition)
+            Snackbar.make(it, R.string.Note_deleted, Snackbar.LENGTH_LONG).apply {
+                setAction("Undo") {
+                    notes.add(deletedPosition, deletedNote)
+                    notifyItemInserted(deletedPosition)
+                    addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
+                    dismiss()
+                }
+                show()
             }
-        })
+            false
+        }
     }
 
     fun swapList(newList: MutableList<Note>) {
@@ -45,17 +64,35 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onDele
         notifyDataSetChanged()
     }
 
+    fun filter(charText: String) {
+        var charText1 = charText
+        charText1 = charText1.toLowerCase(Locale.getDefault())
+        notes.clear()
+        if (charText1.isEmpty()) {
+            notes.addAll(arraylist)
+        } else {
+            for (note in arraylist) {
+                if (note.titleNote?.toLowerCase(Locale.getDefault())!!.contains(charText1)) {
+                    notes.add(note)
+                }
+            }
+        }
+        notifyDataSetChanged()
+    }
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val noteTitle: TextView? = view.titleNote
         val noteDescription: TextView? = view.descriptionNote
         val noteDate: TextView? = view.dateNote
-        val noteDeleteImage: ImageView? = view.delete_single_item
-        val cardView: CardView? = view.cardViewlayout
+        val cardView: LinearLayout? = view.cardView
     }
-
 }
 
-interface OnDeleteClickListener {
-    fun onDeleteClick(position: Int)
+interface OnClickListener {
+    fun onLongPressDelete(position: Int)
+}
+
+interface InsertDeleteNote {
+    fun insertDeletedNote(position: Int, note: Note)
 }
 

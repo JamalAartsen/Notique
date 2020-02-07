@@ -8,6 +8,25 @@
     <string name="descending">Descending</string>
     <string name="date_newest">DateNewest</string>
     <string name="date_oldest">DateOldest</string>
+    <string name="date">date</string>
+    <string name="title">Title</string>
+    <string name="dot">dot</string>
+    <string name="noteimage">noteImage</string>
+    <string name="note_added">Note is added!</string>
+    <string name="date_format">dd-MM-yyyy</string>
+    <string name="note_edited">Note is edited!</string>
+    <string name="delete_all_notes_message">Are you sure you want to delete all your notes?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="sort_by">Sort By</string>
+    <string name="sort">SORT</string>
+    <string name="cancel">CANCEL</string>
+    <string name="Note_deleted">Note Deleted</string>
+    <string name="all_notes_deleted">All Notes have been deleted</string>
+    <string name="share_note">Share Note</string>
+    <string name="search_note">Search Note</string>
+    <string name="delete_notes">Delete Notes</string>
+    <string name="filter_notes">Filter Notes</string>
 
     <string-array name="filter_notes">
         <item>Title: A-Z</item>

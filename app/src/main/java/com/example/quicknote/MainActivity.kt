@@ -2,23 +2,15 @@ package com.example.quicknote
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.SearchManager
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.GestureDetector
+import android.view.*
 import android.view.GestureDetector.SimpleOnGestureListener
-import android.view.Menu
-import android.view.MenuItem
-import android.view.MotionEvent
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
@@ -30,11 +22,9 @@ import kotlin.collections.ArrayList
 class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
     private var notes: MutableList<Note> = ArrayList()
-    var db = NoteRoomDatabase
     private var noteAdapter: NoteAdapter? = null
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var gestureDetector: GestureDetector
-    private var modifyPosition = 0
     private lateinit var items: ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,19 +32,34 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager =
-            StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
-        recyclerView.adapter = NoteAdapter(notes, this, object : OnDeleteClickListener {
-            override fun onDeleteClick(position: Int) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
+
+        toolbar.setNavigationIcon(R.drawable.ic_clip)
+
+        recyclerView.apply {
+            setHasFixedSize(true)
+            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            adapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
+                override fun onLongPressDelete(position: Int) {
+
+                }
+            }, object : InsertDeleteNote {
+                override fun insertDeletedNote(position: Int, note: Note) {
+
+                }
+            })
+        }
 
         noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         noteViewModel.allNotes.observe(this, Observer<MutableList<Note>> { notes ->
             this.notes = notes
             updateUI()
+            if (notes.isEmpty()) {
+                recyclerView.visibility = View.GONE
+                textView.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.VISIBLE
+                textView.visibility = View.GONE
+            }
         })
 
         fab.setOnClickListener {
@@ -69,43 +74,20 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         })
 
         recyclerView.addOnItemTouchListener(this)
-
-        val simpleItemTouchCallback: ItemTouchHelper.SimpleCallback = object :
-            ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
-            ): Boolean {
-                return false
-            }
-
-            //Called when a user swipes left or right on a ViewHolder
-            override fun onSwiped(
-                viewHolder: RecyclerView.ViewHolder,
-                swipeDir: Int
-            ) { //Get the index corresponding to the selected position
-                val position = viewHolder.adapterPosition
-                noteViewModel.delete(notes[position])
-                notes.removeAt(position)
-                noteAdapter?.notifyItemRemoved(position)
-                updateUI()
-            }
-        }
-
-        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
     }
 
     private fun updateUI() {
         if (noteAdapter == null) {
-            noteAdapter = NoteAdapter(notes, applicationContext, object : OnDeleteClickListener {
-                override fun onDeleteClick(position: Int) {
-                    Toast.makeText(applicationContext, "$position + Jamal", Toast.LENGTH_SHORT).show()
+            noteAdapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
+                override fun onLongPressDelete(position: Int) {
                     noteViewModel.delete(notes[position])
                     notes.removeAt(position)
                     noteAdapter?.notifyItemRemoved(position)
-                    updateUI()
+
+                }
+            }, object : InsertDeleteNote {
+                override fun insertDeletedNote(position: Int, note: Note) {
+                    noteViewModel.insert(note)
                 }
             })
             recyclerView.adapter = noteAdapter
@@ -115,41 +97,33 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         menu.findItem(R.id.action_share).apply {
             isVisible = false // Hide item for this activity
         }
 
-        val manager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
+        if (searchItem != null) {
+            val searchView = searchItem.actionView as SearchView
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    return false
+                }
 
-        searchView.imeOptions = EditorInfo.IME_ACTION_DONE
-
-        searchView.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return false
-            }
-
-            override fun onQueryTextChange(newText: String): Boolean {
-                return false
-            }
-        })
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    newText?.let { noteAdapter?.filter(it) }
+                    return false
+                }
+            })
+        }
 
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_delete_notes) {
-            popUpDialogDeleteAllNotes()
-            return true
-        }
-
-        if (item.itemId == R.id.action_filter_list) {
-            showFilterDialog()
-            return true
+        when(item.itemId) {
+            R.id.action_delete_notes -> popUpDialogDeleteAllNotes()
+            R.id.action_filter_list -> showFilterDialog()
         }
 
         return super.onOptionsItemSelected(item)
@@ -175,7 +149,7 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
     }
 
     override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
@@ -184,9 +158,6 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
         if (child != null && gestureDetector.onTouchEvent(e)) {
             val intentEditNote = Intent(this, EditNote::class.java).apply {
-                if (noteAdapterPosition != null) {
-                    modifyPosition = noteAdapterPosition
-                }
                 putExtra(SEND_DATA_EDIT_NOTE, noteAdapterPosition?.let { notes[it] })
             }
             startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
@@ -196,29 +167,35 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
     }
 
     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     private fun sortNotes(item: String) {
-        if (item == getString(R.string.ascending)) { notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toString().compareTo(o2.titleNote.toString()) })
+        if (item == getString(R.string.ascending)) {
+            notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toString().compareTo(o2.titleNote.toString()) })
             updateUI()
-        } else if (item == getString(R.string.descending)) { notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toString().compareTo(o1.titleNote.toString()) })
+        } else if (item == getString(R.string.descending)) {
+            notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toString().compareTo(o1.titleNote.toString()) })
             updateUI()
-        } else if (item == getString(R.string.date_newest)) { notes.sortWith(Comparator { o1, o2 ->  o1.dateNote.toString().compareTo(o2.dateNote.toString()) })
+        } else if (item == getString(R.string.date_newest)) {
+            notes.sortWith(Comparator { o1, o2 -> o1.dateNote.toString().compareTo(o2.dateNote.toString()) })
             updateUI()
-        } else { notes.sortWith(Comparator { o1, o2 ->  o2.dateNote.toString().compareTo(o1.dateNote.toString()) })
+        } else {
+            notes.sortWith(Comparator { o1, o2 -> o2.dateNote.toString().compareTo(o1.dateNote.toString()) })
             updateUI()
         }
     }
 
     private fun popUpDialogDeleteAllNotes() {
         val builder = AlertDialog.Builder(this).apply {
-            setMessage("Are you sure you want to delete all your notes?")
+            setMessage(R.string.delete_all_notes_message)
             setCancelable(true)
-            setPositiveButton("Yes") { dialog, id ->
+            setPositiveButton(R.string.yes) { dialog, id ->
                 noteViewModel.deleteAllNotes()
-                dialog.cancel() }
-            setNegativeButton("No") { dialog, id -> dialog.cancel() }
+                dialog.cancel()
+                Toast.makeText(applicationContext, R.string.delete_all_notes_message, Toast.LENGTH_SHORT).show()
+            }
+            setNegativeButton(R.string.no) { dialog, id -> dialog.cancel() }
         }
 
         builder.create().show()
@@ -226,10 +203,11 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
 
     private fun showFilterDialog() {
         val alertDialog = AlertDialog.Builder(this).apply {
-            setTitle("Sort By")
+            setTitle(R.string.sort_by)
             setIcon(R.drawable.ic_filter_list)
             setSingleChoiceItems(R.array.filter_notes, -1) { dialog, which ->
-                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending), getString(R.string.date_newest), getString(R.string.date_oldest))
+                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending),
+                    getString(R.string.date_newest), getString(R.string.date_oldest))
                 when (which) {
                     0 -> { sortNotes(items[which]) }
                     1 -> { sortNotes(items[which]) }
@@ -237,8 +215,8 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                     3 -> { sortNotes(items[which]) }
                 }
             }
-            setPositiveButton("SORT") { dialog, _ -> dialog.cancel() }
-            setNegativeButton("CANCEL") { dialog, _ -> dialog.cancel() }
+            setPositiveButton(R.string.sort) { dialog, _ -> dialog.cancel() }
+            setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
         }
         alertDialog.create().show()
     }

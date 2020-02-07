@@ -17,4 +17,14 @@
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:gravity="center"
+        android:text="You don't have any notes at the moment. Add a note to see it here!"
+        android:visibility="gone"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:textStyle="italic"
+        android:layout_height="match_parent"/>
 </RelativeLayout>

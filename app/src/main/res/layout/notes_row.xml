@@ -2,22 +2,20 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
+    android:id="@+id/cardViewlayout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:backgroundTint="@color/background_cardview"
-    android:id="@+id/cardViewlayout"
     android:orientation="vertical"
     app:cardCornerRadius="2dp">
-    <!--app:strokeColor="@color/cardview_borderline_color"-->
-    <!--app:strokeWidth="1dp">-->
-
 
     <LinearLayout
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:clickable="true"
+        android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground">
 
         <RelativeLayout
@@ -35,14 +33,14 @@
                     android:layout_width="15dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="5dp"
+                    android:contentDescription="@string/dot"
                     android:src="@drawable/dot" />
 
                 <TextView
                     android:id="@+id/titleNote"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:layout_alignParentTop="true"
-                    android:text="Title"
+                    android:text="@string/title"
                     android:textColor="@color/black"
                     android:textSize="15sp"
                     android:textStyle="bold" />
@@ -70,22 +68,23 @@
                     android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/delete_single_item"
-                        android:src="@drawable/ic_delete_single_item"
+                        android:id="@+id/note_logo"
                         android:layout_width="wrap_content"
-                        android:layout_height="40dp"/>
+                        android:layout_height="40dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="@string/noteimage"
+                        android:src="@drawable/ic_clip" />
 
                     <TextView
                         android:id="@+id/dateNote"
                         android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_below="@id/descriptionNote"
-                        android:layout_alignParentTop="true"
-                        android:gravity="right"
-                        android:text="date"
+                        android:layout_height="20dp"
+                        android:gravity="end"
+                        android:text="@string/date"
                         android:textColor="@color/black"
                         android:textSize="10sp"
-                        android:textStyle="italic" />
+                        android:textStyle="italic"
+                        card_view:ignore="SmallSp" />
                 </LinearLayout>
             </LinearLayout>
 
