@@ -10,6 +10,7 @@ class NoteRepository(private val noteDao: NoteDao) {
         Executors.newSingleThreadExecutor()
 
     val allNote: LiveData<MutableList<Note>> = noteDao.getAllNotes()
+    val orderAllNotes: LiveData<MutableList<Note>> = noteDao.orderNoteList()
 
     fun insert(note: Note) {
         mExecutor.execute {

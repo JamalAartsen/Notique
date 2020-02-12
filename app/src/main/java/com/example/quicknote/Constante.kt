@@ -9,6 +9,9 @@ const val SEND_NOTE_DATA = "sendNoteData"
 const val EDIT_REQUEST_CODE = 2
 const val SEND_DATA_EDIT_NOTE = "sendDataEditNote"
 const val SEND_EDITED_NOTE = "sendEditedNote"
+const val POSITION_SORTING = "position_sorting"
+const val SHARED_PREFERENCES = "shared_preferences"
+const val SELECTED_ITEM_POSITION_DIALOG_SORTING = "selected_dialog_item_position"
 
 fun shareData(titleNote: String, descriptionNote: String, context: Context) {
     val sendIntent: Intent = Intent().apply {

@@ -2,44 +2,54 @@ package com.example.quicknote
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.*
-import android.view.GestureDetector.SimpleOnGestureListener
-import android.widget.Toast
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
+class MainActivity : AppCompatActivity() {
 
     private var notes: MutableList<Note> = ArrayList()
     private var noteAdapter: NoteAdapter? = null
     private lateinit var noteViewModel: NoteViewModel
-    private lateinit var gestureDetector: GestureDetector
     private lateinit var items: ArrayList<String>
+    lateinit var sharedPreferences: SharedPreferences
+    var isClickPosition = -1
+    var selectedItemPosition = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-
-
         toolbar.setNavigationIcon(R.drawable.ic_clip)
+
+        sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE)
 
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             adapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
                 override fun onLongPressDelete(position: Int) {
+
+                }
+
+                override fun onClick(position: Int) {
 
                 }
             }, object : InsertDeleteNote {
@@ -55,25 +65,20 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
             updateUI()
             if (notes.isEmpty()) {
                 recyclerView.visibility = View.GONE
-                textView.visibility = View.VISIBLE
+                linear_layout_no_notes.visibility = View.VISIBLE
             } else {
                 recyclerView.visibility = View.VISIBLE
-                textView.visibility = View.GONE
+                linear_layout_no_notes.visibility = View.GONE
             }
+
+            val isClicked = sharedPreferences.getInt(POSITION_SORTING, 6)
+            sortingMethod(isClicked)
         })
 
         fab.setOnClickListener {
             val intentAddNote = Intent(this, AddNote::class.java)
             startActivityForResult(intentAddNote, ADD_REQUEST_CODE)
         }
-
-        gestureDetector = GestureDetector(this, object : SimpleOnGestureListener() {
-            override fun onSingleTapUp(e: MotionEvent): Boolean {
-                return true
-            }
-        })
-
-        recyclerView.addOnItemTouchListener(this)
     }
 
     private fun updateUI() {
@@ -83,7 +88,13 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                     noteViewModel.delete(notes[position])
                     notes.removeAt(position)
                     noteAdapter?.notifyItemRemoved(position)
+                }
 
+                override fun onClick(position: Int) {
+                    val intentEditNote = Intent(applicationContext, EditNote::class.java).apply {
+                        putExtra(SEND_DATA_EDIT_NOTE, position.let { notes[it] })
+                    }
+                    startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
                 }
             }, object : InsertDeleteNote {
                 override fun insertDeletedNote(position: Int, note: Note) {
@@ -111,7 +122,8 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    newText?.let { noteAdapter?.filter(it) }
+                    //newText?.let { noteAdapter?.filter(it) }
+                    noteAdapter?.filter?.filter(newText)
                     return false
                 }
             })
@@ -148,41 +160,21 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
         }
     }
 
-    override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+    private fun saveIsClickPreferences(isClickedPosition: Int) {
+        isClickPosition = isClickedPosition
+        sharedPreferences.edit().putInt(POSITION_SORTING, isClickedPosition).apply()
 
     }
 
-    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-        val child = recyclerView.findChildViewUnder(e.x, e.y)
-        val noteAdapterPosition = child?.let { recyclerView.getChildAdapterPosition(it) }
-
-        if (child != null && gestureDetector.onTouchEvent(e)) {
-            val intentEditNote = Intent(this, EditNote::class.java).apply {
-                putExtra(SEND_DATA_EDIT_NOTE, noteAdapterPosition?.let { notes[it] })
-            }
-            startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
-        }
-
-        return false
-    }
-
-    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-
-    }
-
-    private fun sortNotes(item: String) {
-        if (item == getString(R.string.ascending)) {
-            notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toString().compareTo(o2.titleNote.toString()) })
-            updateUI()
-        } else if (item == getString(R.string.descending)) {
-            notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toString().compareTo(o1.titleNote.toString()) })
-            updateUI()
-        } else if (item == getString(R.string.date_newest)) {
+    private fun <T> sortingMethod(value: T) {
+        if (value == 0 || value == getString(R.string.ascending)) {
+            notes.sortWith(Comparator { o1, o2 -> o1.titleNote.compareTo(o2.titleNote) })
+        } else if (value == 1 || value == getString(R.string.descending)) {
+            notes.sortWith(Comparator { o1, o2 -> o2.titleNote.compareTo(o1.titleNote) })
+        } else if (value == 1 || value == getString(R.string.date_newest)) {
             notes.sortWith(Comparator { o1, o2 -> o1.dateNote.toString().compareTo(o2.dateNote.toString()) })
-            updateUI()
         } else {
             notes.sortWith(Comparator { o1, o2 -> o2.dateNote.toString().compareTo(o1.dateNote.toString()) })
-            updateUI()
         }
     }
 
@@ -193,7 +185,6 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
             setPositiveButton(R.string.yes) { dialog, id ->
                 noteViewModel.deleteAllNotes()
                 dialog.cancel()
-                Toast.makeText(applicationContext, R.string.delete_all_notes_message, Toast.LENGTH_SHORT).show()
             }
             setNegativeButton(R.string.no) { dialog, id -> dialog.cancel() }
         }
@@ -202,17 +193,35 @@ class MainActivity : AppCompatActivity(), RecyclerView.OnItemTouchListener {
     }
 
     private fun showFilterDialog() {
+        selectedItemPosition = sharedPreferences.getInt(SELECTED_ITEM_POSITION_DIALOG_SORTING, -1)
         val alertDialog = AlertDialog.Builder(this).apply {
             setTitle(R.string.sort_by)
             setIcon(R.drawable.ic_filter_list)
-            setSingleChoiceItems(R.array.filter_notes, -1) { dialog, which ->
+            setSingleChoiceItems(R.array.filter_notes, selectedItemPosition) { dialog, which ->
+                sharedPreferences.edit().putInt(SELECTED_ITEM_POSITION_DIALOG_SORTING, which).apply()
                 items = arrayListOf(getString(R.string.ascending), getString(R.string.descending),
                     getString(R.string.date_newest), getString(R.string.date_oldest))
                 when (which) {
-                    0 -> { sortNotes(items[which]) }
-                    1 -> { sortNotes(items[which]) }
-                    2 -> { sortNotes(items[which]) }
-                    3 -> { sortNotes(items[which]) }
+                    0 -> {
+                        sortingMethod(items[which])
+                        updateUI()
+                        saveIsClickPreferences(which)
+                    }
+                    1 -> {
+                        sortingMethod(items[which])
+                        updateUI()
+                        saveIsClickPreferences(which)
+                    }
+                    2 -> {
+                        sortingMethod(items[which])
+                        updateUI()
+                        saveIsClickPreferences(which)
+                    }
+                    3 -> {
+                        sortingMethod(items[which])
+                        updateUI()
+                        saveIsClickPreferences(which)
+                    }
                 }
             }
             setPositiveButton(R.string.sort) { dialog, _ -> dialog.cancel() }

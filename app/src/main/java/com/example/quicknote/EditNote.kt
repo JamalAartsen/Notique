@@ -40,12 +40,19 @@ class EditNote : AppCompatActivity() {
                 dateNote = currentDate
             }
 
-            val editIntent = Intent().apply {
-                putExtra(SEND_EDITED_NOTE, note)
+            if (note != null) {
+                if (note.titleNote.isEmpty()) {
+                    Toast.makeText(this, R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
+                } else {
+                    val editIntent = Intent().apply {
+                        putExtra(SEND_EDITED_NOTE, note)
+                    }
+
+                    Toast.makeText(this, R.string.note_edited, Toast.LENGTH_SHORT).show()
+                    setResult(Activity.RESULT_OK, editIntent)
+                }
             }
 
-            Toast.makeText(this, R.string.note_edited, Toast.LENGTH_SHORT).show()
-            setResult(Activity.RESULT_OK, editIntent)
         }
     }
 

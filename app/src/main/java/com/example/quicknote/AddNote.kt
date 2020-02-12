@@ -28,12 +28,16 @@ class AddNote : AppCompatActivity() {
 
         fab.setOnClickListener {
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate)
-            val intentSendData = Intent().apply {
-                putExtra(SEND_NOTE_DATA, note)
-            }
+            if (note.titleNote.isEmpty()) {
+                Toast.makeText(this, R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
+            } else {
+                val intentSendData = Intent().apply {
+                    putExtra(SEND_NOTE_DATA, note)
+                }
 
-            Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show()
-            setResult(Activity.RESULT_OK, intentSendData)
+                Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show()
+                setResult(Activity.RESULT_OK, intentSendData)
+            }
         }
     }
 

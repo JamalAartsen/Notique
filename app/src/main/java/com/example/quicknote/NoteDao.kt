@@ -2,7 +2,6 @@ package com.example.quicknote
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.quicknote.Note
 
 @Dao
 interface NoteDao {
@@ -21,4 +20,7 @@ interface NoteDao {
 
     @Query("SELECT * FROM note_table")
     fun getAllNotes(): LiveData<MutableList<Note>>
+
+    @Query("SELECT * FROM note_table ORDER BY title_note")
+    fun orderNoteList(): LiveData<MutableList<Note>>
 }
