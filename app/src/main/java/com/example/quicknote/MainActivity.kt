@@ -168,13 +168,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun <T> sortingMethod(value: T) {
         if (value == 0 || value == getString(R.string.ascending)) {
-            notes.sortWith(Comparator { o1, o2 -> o1.titleNote.compareTo(o2.titleNote) })
+            notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toLowerCase(Locale.getDefault()).compareTo(o2.titleNote.toLowerCase(Locale.getDefault())) })
         } else if (value == 1 || value == getString(R.string.descending)) {
-            notes.sortWith(Comparator { o1, o2 -> o2.titleNote.compareTo(o1.titleNote) })
+            notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toLowerCase(Locale.getDefault()).compareTo(o1.titleNote.toLowerCase(Locale.getDefault())) })
         } else if (value == 1 || value == getString(R.string.date_newest)) {
-            notes.sortWith(Comparator { o1, o2 -> o1.dateNote.toString().compareTo(o2.dateNote.toString()) })
+            notes.sortWith(Comparator { o1, o2 -> o1.dateNote.toString().toLowerCase(Locale.getDefault()).compareTo(o2.dateNote.toString().toLowerCase(Locale.getDefault())) })
         } else {
-            notes.sortWith(Comparator { o1, o2 -> o2.dateNote.toString().compareTo(o1.dateNote.toString()) })
+            notes.sortWith(Comparator { o1, o2 -> o2.dateNote.toString().toLowerCase(Locale.getDefault()).compareTo(o1.dateNote.toString().toLowerCase(Locale.getDefault())) })
         }
     }
 

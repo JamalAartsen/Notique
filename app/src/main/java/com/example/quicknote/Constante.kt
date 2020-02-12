@@ -16,8 +16,8 @@ const val SELECTED_ITEM_POSITION_DIALOG_SORTING = "selected_dialog_item_position
 fun shareData(titleNote: String, descriptionNote: String, context: Context) {
     val sendIntent: Intent = Intent().apply {
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_SUBJECT, titleNote)
-        putExtra(Intent.EXTRA_TEXT, descriptionNote)
+        putExtra(Intent.EXTRA_SUBJECT, "Look at my note!")
+        putExtra(Intent.EXTRA_TEXT, "$titleNote \n\n$descriptionNote")
         type = "text/plain"
     }
 
