@@ -9,6 +9,24 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <com.jetradarmobile.snowfall.SnowfallView
+        android:id="@+id/snow_fall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:snowflakeAlphaMax="160"
+        app:snowflakeAlphaMin="150"
+        app:snowflakeAngleMax="5"
+        app:snowflakeImage="@drawable/logostickynote"
+        app:snowflakesAlreadyFalling="false"
+        app:snowflakesFadingEnabled="false"
+        app:snowflakeSizeMax="12dp"
+        app:snowflakeSizeMin="8dp"
+        app:snowflakeSpeedMax="12"
+        app:snowflakeSpeedMin="4"
+        app:snowflakesNum="100">
+
+    </com.jetradarmobile.snowfall.SnowfallView>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
@@ -17,22 +35,21 @@
         android:scrollbars="vertical"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp" />
-
     <LinearLayout
         android:id="@+id/linear_layout_no_notes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <ImageView
-            android:src="@drawable/ic_document"
-            android:layout_marginBottom="40dp"
             android:layout_width="match_parent"
-            android:alpha="0.55"
             android:layout_height="wrap_content"
-            android:contentDescription="Note" />
+            android:layout_marginBottom="40dp"
+            android:alpha="0.55"
+            android:contentDescription="Note"
+            android:src="@drawable/ic_document" />
 
         <TextView
             android:id="@+id/no_notes"
@@ -47,9 +64,9 @@
         <TextView
             android:id="@+id/text_uitleg_no_notes"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
-            android:layout_height="wrap_content"
             android:gravity="center"
             android:text="You don't have any notes at the moment. Add new notes to see them here."
             android:textSize="15sp"

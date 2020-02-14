@@ -65,9 +65,11 @@ class MainActivity : AppCompatActivity() {
             updateUI()
             if (notes.isEmpty()) {
                 recyclerView.visibility = View.GONE
+                snow_fall.visibility = View.GONE
                 linear_layout_no_notes.visibility = View.VISIBLE
             } else {
                 recyclerView.visibility = View.VISIBLE
+                snow_fall.visibility = View.VISIBLE
                 linear_layout_no_notes.visibility = View.GONE
             }
 
