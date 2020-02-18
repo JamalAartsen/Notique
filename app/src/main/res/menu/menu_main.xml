@@ -4,6 +4,12 @@
     tools:context="com.example.quicknote.MainActivity">
 
     <item
+        android:id="@+id/action_bijlage"
+        android:title="@string/bijlage"
+        android:icon="@drawable/ic_attachment"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_share"
         android:title="@string/share_note"
         android:icon="@drawable/ic_share"

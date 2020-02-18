@@ -20,7 +20,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
 
     private var notesListSearch: MutableList<Note>
     private var deletedPosition: Int = 0
-    private var deletedNote: Note = Note(0, "", "", "")
+    private var deletedNote: Note = Note(0, "", "", "", null)
 
     init {
         notesListSearch = ArrayList(notes)

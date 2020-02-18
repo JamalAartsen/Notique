@@ -7,15 +7,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "note_table")
-data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
+class Note(@PrimaryKey(autoGenerate = true) val id: Int,
                 @ColumnInfo(name = "title_note") var titleNote: String,
                 @ColumnInfo(name = "description_note") var descriptionNote: String?,
-                @ColumnInfo(name = "date-note") var dateNote: String?): Parcelable {
+                @ColumnInfo(name = "date-note") var dateNote: String?,
+                @ColumnInfo(name = "image_note") var imageUriNote: ByteArray?): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString().toString(),
         parcel.readString(),
-        parcel.readString()
+        parcel.readString(),
+        parcel.createByteArray()
     ) {
     }
 
@@ -24,6 +26,7 @@ data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
         parcel.writeString(titleNote)
         parcel.writeString(descriptionNote)
         parcel.writeString(dateNote)
+        parcel.writeByteArray(imageUriNote)
     }
 
     override fun describeContents(): Int {

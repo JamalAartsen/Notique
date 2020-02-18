@@ -1,22 +1,22 @@
 package com.example.quicknote
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
@@ -66,7 +66,8 @@ class MainActivity : AppCompatActivity() {
             if (notes.isEmpty()) {
                 recyclerView.visibility = View.GONE
                 snow_fall.visibility = View.GONE
-                linear_layout_no_notes.visibility = View.VISIBLE
+                //linear_layout_no_notes.visibility = View.VISIBLE
+                SlideViewUp(linear_layout_no_notes)
             } else {
                 recyclerView.visibility = View.VISIBLE
                 snow_fall.visibility = View.VISIBLE
@@ -81,6 +82,27 @@ class MainActivity : AppCompatActivity() {
             val intentAddNote = Intent(this, AddNote::class.java)
             startActivityForResult(intentAddNote, ADD_REQUEST_CODE)
         }
+    }
+
+    fun SlideViewUp(view: View) {
+        view.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val TRANSLATION_Y = view.height
+                view.translationY = TRANSLATION_Y.toFloat()
+                view.visibility = View.GONE
+                view.animate()
+                    .translationYBy((-TRANSLATION_Y).toFloat())
+                    .setDuration(200)
+                    .setStartDelay(0)
+                    .setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationStart(animation: Animator) {
+                            view.visibility = View.VISIBLE
+                        }
+                    })
+                    .start()
+            }
+        })
     }
 
     private fun updateUI() {
@@ -111,9 +133,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        menu.findItem(R.id.action_share).apply {
-            isVisible = false // Hide item for this activity
-        }
+        hideIcon(R.id.action_share, menu)
+        hideIcon(R.id.action_bijlage, menu)
 
         val searchItem = menu.findItem(R.id.action_search)
         if (searchItem != null) {

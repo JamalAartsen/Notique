@@ -37,13 +37,22 @@
             <EditText
                 android:id="@+id/description_edit_note"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="300dp"
                 android:autofillHints="Title"
                 android:background="@color/background_cardview"
                 android:gravity="top"
                 android:hint="Description"
                 android:padding="10dp"
                 android:textSize="20sp" />
+
+            <ImageView
+                android:id="@+id/image_note_edit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="TODO"
+                android:scaleType="centerInside"
+                android:visibility="visible" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
