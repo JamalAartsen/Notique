@@ -116,10 +116,10 @@ fun deleteImage(image_note: ImageView, context: Context) {
     }
 }
 
-fun imageToByteArray(image_note: ImageView): ByteArray {
-    val bitmap: Bitmap? = (image_note.drawable as BitmapDrawable?)?.bitmap
+fun imageToByteArray(image_note: ImageView?): ByteArray {
+    val bitmap: Bitmap? = (image_note?.drawable as BitmapDrawable?)?.bitmap
     val baos = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+    bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baos)
 
     return baos.toByteArray()
 }

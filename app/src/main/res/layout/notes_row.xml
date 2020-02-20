@@ -64,16 +64,17 @@
                     android:textStyle="normal" />
 
                 <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/note_logo"
                         android:layout_width="wrap_content"
+                        android:src="@drawable/ic_clip"
                         android:layout_height="40dp"
                         android:layout_gravity="center_vertical"
-                        android:contentDescription="@string/noteimage"
-                        android:src="@drawable/ic_clip" />
+                        android:contentDescription="@string/noteimage" />
 
                     <TextView
                         android:id="@+id/dateNote"

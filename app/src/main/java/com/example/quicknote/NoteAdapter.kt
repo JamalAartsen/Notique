@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.notes_row.view.*
@@ -82,7 +79,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
             notes.addAll(notesListSearch)
         } else {
             for (note in notesListSearch) {
-                if (note.titleNote?.toLowerCase(Locale.getDefault())!!.contains(charText1)) {
+                if (note.titleNote.toLowerCase(Locale.getDefault()).contains(charText1)) {
                     notes.add(note)
                 }
             }
@@ -95,6 +92,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
         val noteDescription: TextView? = view.descriptionNote
         val noteDate: TextView? = view.dateNote
         val cardView: LinearLayout? = view.cardView
+        val bijlageImageNote: ImageView? = view.note_logo
     }
 
     override fun getFilter(): Filter {
@@ -111,7 +109,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
                 val filterPattern = constraint.toString().toLowerCase(Locale.getDefault()).trim()
 
                 for (note in notesListSearch) {
-                    if (note.titleNote?.toLowerCase(Locale.getDefault())?.contains(filterPattern)) {
+                    if (note.titleNote.toLowerCase(Locale.getDefault()).contains(filterPattern)) {
                         filteredList.add(note)
                     }
                 }

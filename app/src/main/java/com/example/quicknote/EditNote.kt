@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class EditNote : AppCompatActivity() {
+
+    var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +47,9 @@ class EditNote : AppCompatActivity() {
         if (note?.imageUriNote?.size != null) {
             val bitmap =
                 BitmapFactory.decodeByteArray(note.imageUriNote, 0, note.imageUriNote!!.size)
+
+            imageUri = getBitmapFromView(bitmap, this)
+
             image_note_edit.apply {
                 visibility = View.VISIBLE
                 setImageBitmap(bitmap)
@@ -86,6 +92,7 @@ class EditNote : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_delete_image -> {
                 deleteImage(image_note_edit, applicationContext)
+                imageUri = null
                 true
             }
             else -> super.onContextItemSelected(item)
@@ -104,6 +111,11 @@ class EditNote : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.action_share) {
+            if (imageUri != null) {
+                shareImageFromUri(imageUri, this, title_edit_note.text.toString(), description_edit_note.text.toString())
+            } else {
+                shareData(title_edit_note.text.toString(), description_edit_note.text.toString(), this)
+            }
             return true
         }
 
@@ -124,6 +136,7 @@ class EditNote : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE_GALERY) {
             setImageToView(this, data, image_note_edit)
+            imageUri = data?.data
         }
     }
 

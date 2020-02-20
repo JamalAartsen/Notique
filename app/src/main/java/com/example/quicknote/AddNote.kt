@@ -3,8 +3,6 @@ package com.example.quicknote
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -38,7 +36,6 @@ class AddNote : AppCompatActivity() {
 
         val currentDate: String =
             SimpleDateFormat(getString(R.string.date_format), Locale.getDefault()).format(Date())
-
 
         fab.setOnClickListener {
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate, imageToByteArray(image_note) )
