@@ -7,4 +7,5 @@
     <color name="background_cardview">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="grey_light">#C2C5CC</color>
 </resources>

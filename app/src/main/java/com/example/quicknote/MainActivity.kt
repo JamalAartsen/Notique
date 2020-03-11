@@ -8,23 +8,31 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
+import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    private var actionMode: ActionMode? = null
     private var notes: MutableList<Note> = ArrayList()
     private var noteAdapter: NoteAdapter? = null
     private lateinit var noteViewModel: NoteViewModel
@@ -32,15 +40,27 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
     var isClickPosition = -1
     var selectedItemPosition = -1
+    private lateinit var drawerLayout: DrawerLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
-        toolbar.setNavigationIcon(R.drawable.ic_clip)
 
+        // Navigation Drawer
+        drawerLayout = drawer_layout
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar,
+            R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        nav_view.setNavigationItemSelectedListener(this)
+
+        // Shared Preferences
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE)
 
+        // Recyclerview opbouw
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -67,7 +87,7 @@ class MainActivity : AppCompatActivity() {
                 recyclerView.visibility = View.GONE
                 snow_fall.visibility = View.GONE
                 //linear_layout_no_notes.visibility = View.VISIBLE
-                SlideViewUp(linear_layout_no_notes)
+                slideViewUp(linear_layout_no_notes)
             } else {
                 recyclerView.visibility = View.VISIBLE
                 snow_fall.visibility = View.VISIBLE
@@ -76,6 +96,7 @@ class MainActivity : AppCompatActivity() {
 
             val isClicked = sharedPreferences.getInt(POSITION_SORTING, 6)
             sortingMethod(isClicked)
+            noteAdapter?.noteListSearch()
         })
 
         fab.setOnClickListener {
@@ -84,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun SlideViewUp(view: View) {
+    private fun slideViewUp(view: View) {
         view.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 view.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -112,6 +133,15 @@ class MainActivity : AppCompatActivity() {
                     noteViewModel.delete(notes[position])
                     notes.removeAt(position)
                     noteAdapter?.notifyItemRemoved(position)
+
+//                    when (actionMode) {
+//                        null -> {
+//                            // Start the CAB using the ActionMode.Callback defined above
+//                            actionMode = startActionMode(actionModeCallBack)
+//
+//                        }
+//                        else -> Log.d("Hello", "Hello")
+//                    }
                 }
 
                 override fun onClick(position: Int) {
@@ -129,6 +159,36 @@ class MainActivity : AppCompatActivity() {
         } else {
             noteAdapter?.swapList(notes)
         }
+    }
+
+    private val actionModeCallBack: ActionMode.Callback = object : ActionMode.Callback {
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            when(item?.itemId) {
+                R.id.delete_note_list -> {
+                    Toast.makeText(applicationContext, "Notedelete", Toast.LENGTH_SHORT).show()
+                    mode?.finish()
+                }
+                else -> Log.d("Nothing", "")
+            }
+
+            return false
+        }
+
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            mode?.menuInflater?.inflate(R.menu.menu_action_mode, menu)
+            mode?.setTitle(noteAdapter?.allSelectedNotes())
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onDestroyActionMode(mode: ActionMode?) {
+            actionMode = null
+            noteAdapter?.clearAllHighLightedNotes()
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -189,15 +249,16 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    // Word misschien in de adapter klasse gestopt.
     private fun <T> sortingMethod(value: T) {
         if (value == 0 || value == getString(R.string.ascending)) {
             notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toLowerCase(Locale.getDefault()).compareTo(o2.titleNote.toLowerCase(Locale.getDefault())) })
         } else if (value == 1 || value == getString(R.string.descending)) {
             notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toLowerCase(Locale.getDefault()).compareTo(o1.titleNote.toLowerCase(Locale.getDefault())) })
-        } else if (value == 1 || value == getString(R.string.date_newest)) {
-            notes.sortWith(Comparator { o1, o2 -> o1.dateNote.toString().toLowerCase(Locale.getDefault()).compareTo(o2.dateNote.toString().toLowerCase(Locale.getDefault())) })
+        } else if (value == 2 || value == getString(R.string.date_newest)) {
+            notes.sortWith(compareByDescending<Note> { it.dateNote }.thenBy { it.titleNote })
         } else {
-            notes.sortWith(Comparator { o1, o2 -> o2.dateNote.toString().toLowerCase(Locale.getDefault()).compareTo(o1.dateNote.toString().toLowerCase(Locale.getDefault())) })
+            notes.sortWith(compareBy<Note> { it.dateNote }.thenBy { it.titleNote })
         }
     }
 
@@ -251,5 +312,27 @@ class MainActivity : AppCompatActivity() {
             setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
         }
         alertDialog.create().show()
+    }
+
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.nav_privacy -> {
+                val intentPrivacy = Intent(this, PrivacyPolicyAcivity::class.java)
+                startActivity(intentPrivacy)
+            }
+
+            R.id.nav_instellingen -> {}
+            R.id.nav_notes -> {}
+        }
+        drawerLayout.closeDrawer(GravityCompat.START)
+        return true
     }
 }
