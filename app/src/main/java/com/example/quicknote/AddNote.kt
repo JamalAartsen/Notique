@@ -221,7 +221,12 @@ class AddNote : AppCompatActivity() {
                 return true
             }
             R.id.camera_foto -> {
-                checkAPIAppVersionCamera()
+                val packageManager: PackageManager = packageManager
+                if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                    checkAPIAppVersionCamera()
+                } else {
+                    Toast.makeText(this, "You don't have a camera app.", Toast.LENGTH_SHORT).show()
+                }
                 return true
             }
         }
