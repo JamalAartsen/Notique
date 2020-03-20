@@ -49,8 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:alpha="0.55"
-            android:contentDescription="Note"
-            android:src="@drawable/ic_document" />
+            android:src="@drawable/ic_document"
+            tools:ignore="ContentDescription"/>
 
         <TextView
             android:id="@+id/no_notes"
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="No Notes"
+            android:text="@string/no_notes"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -69,7 +69,7 @@
             android:layout_marginStart="30dp"
             android:layout_marginEnd="30dp"
             android:gravity="center"
-            android:text="You don't have any notes at the moment. Add new notes to see them here."
+            android:text="@string/you_don_t_have_any_notes_at_the_moment_add_new_notes_to_see_them_here"
             android:textSize="15sp"
             android:textStyle="normal" />
 

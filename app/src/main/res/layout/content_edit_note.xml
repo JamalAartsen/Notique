@@ -23,11 +23,12 @@
                 android:id="@+id/title_edit_note"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:autofillHints="Title"
                 android:background="@color/background_cardview"
-                android:hint="Title"
+                android:hint="@string/title_edit_note"
                 android:padding="10dp"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:inputType="text"
+                tools:ignore="Autofill"/>
 
             <View
                 android:layout_width="match_parent"
@@ -38,20 +39,21 @@
                 android:id="@+id/description_edit_note"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:autofillHints="Title"
                 android:background="@color/background_cardview"
                 android:gravity="top"
-                android:hint="Description"
+                android:hint="@string/description_edit_note"
                 android:padding="10dp"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:inputType="text"
+                tools:ignore="Autofill"/>
 
             <ImageView
                 android:id="@+id/image_note_edit"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="TODO"
                 android:scaleType="centerInside"
-                android:visibility="visible" />
+                android:visibility="visible"
+                tools:ignore="ContentDescription"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

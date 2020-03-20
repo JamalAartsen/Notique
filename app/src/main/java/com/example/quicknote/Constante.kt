@@ -26,6 +26,8 @@ const val POSITION_SORTING = "position_sorting"
 const val SHARED_PREFERENCES = "shared_preferences"
 const val SELECTED_ITEM_POSITION_DIALOG_SORTING = "selected_dialog_item_position"
 const val IMAGE_PICK_CODE_GALERY = 1000
+const val IMAGE_CODE_CAMERA = 1002
+const val PERMISSION_CODE_IMAGE_CAMERA = 1003
 const val PERMISSION_CODE_IMAGE_GALERY = 1001
 
 fun shareData(titleNote: String, descriptionNote: String, context: Context) {

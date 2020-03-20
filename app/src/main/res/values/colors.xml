@@ -8,4 +8,6 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="grey_light">#C2C5CC</color>
+    <color name="gradient_toolbar_above">#4E00FD</color>
+    <color name="gradient_toolbar_below">#1C005A</color>
 </resources>

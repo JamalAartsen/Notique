@@ -32,6 +32,16 @@
     <string name="delete">Delete</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="description">Description</string>
+    <string name="title_add_note">Title</string>
+    <string name="title_edit_note">Title</string>
+    <string name="description_edit_note">Description</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="no_notes">No Notes</string>
+    <string name="you_don_t_have_any_notes_at_the_moment_add_new_notes_to_see_them_here">You don\'t have any notes at the moment. Add new notes to see them here.</string>
+    <string name="nav_header_title">Notique</string>
+    <string name="description_add_note">Description</string>
 
     <string-array name="filter_notes">
         <item>Title: A-Z</item>

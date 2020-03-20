@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.StrictMode
+import android.provider.MediaStore
 import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
@@ -14,15 +16,21 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_add_note.*
 import kotlinx.android.synthetic.main.content_add_note.*
+import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class AddNote : AppCompatActivity() {
 
     var imageUri: Uri? = null
+    lateinit var currentPhotoPath: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,11 +101,74 @@ class AddNote : AppCompatActivity() {
         }
     }
 
+    private fun checkAPIAppVersionCamera() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+                || checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+                val permissions = arrayOf(android.Manifest.permission.CAMERA)
+                requestPermissions(permissions, PERMISSION_CODE_IMAGE_CAMERA)
+            } else {
+                openCamera()
+            }
+        } else {
+            // System OS is lower than m
+            if (PermissionChecker.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PermissionChecker.PERMISSION_DENIED || PermissionChecker.checkSelfPermission(this, android.Manifest.permission.CAMERA) ==
+                PermissionChecker.PERMISSION_DENIED) {
+                val permissions = arrayOf(android.Manifest.permission.CAMERA)
+                ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE_IMAGE_CAMERA)
+            } else {
+                openCamera()
+            }
+        }
+    }
+
+    fun openCamera() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            // Zorgt ervoor dat er een camera activity is die de intent aan kan
+            takePictureIntent.resolveActivity(packageManager)?.also {
+                // Maakt de file aan waar de foto heen gaat
+                val photoFile: File? = try {
+                    createImageFile()
+                } catch (ex: IOException) {
+                    null
+                }
+
+                // Word geactiveerd als er een file is aan gemaakt.
+                photoFile?.also {
+                    val photoUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", it)
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    startActivityForResult(takePictureIntent, IMAGE_CODE_CAMERA)
+                }
+            }
+        }
+    }
+
+    @Throws(IOException::class)
+    private fun createImageFile(): File {
+        // Create an image file name
+        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_PICK_CODE_GALERY) {
             setImageToView(this, data, image_note)
             imageUri = data?.data
+        }
+
+        if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_CODE_CAMERA) {
+            image_note.visibility = View.VISIBLE
+            Glide.with(this).load(currentPhotoPath).into(image_note)
         }
     }
 
@@ -107,7 +178,15 @@ class AddNote : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickImageFromGalery(this)
                 } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            PERMISSION_CODE_IMAGE_CAMERA -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openCamera()
+                } else {
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -124,23 +203,27 @@ class AddNote : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_share) {
-            if (imageUri != null) {
-                shareImageFromUri(imageUri, this, title_add_note.text.toString(), description_add_note.text.toString())
-            } else {
-                shareData(title_add_note.text.toString(), description_add_note.text.toString(), this)
+        when(item.itemId) {
+            R.id.action_share -> {
+                if (imageUri != null) {
+                    shareImageFromUri(imageUri, this, title_add_note.text.toString(), description_add_note.text.toString())
+                } else {
+                    shareData(title_add_note.text.toString(), description_add_note.text.toString(), this)
+                }
+                return true
             }
-            return true
-        }
-
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-
-        if (item.itemId == R.id.action_bijlage) {
-            checkAPIAppVersion()
-            return true
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            R.id.gallery_foto -> {
+                checkAPIAppVersion()
+                return true
+            }
+            R.id.camera_foto -> {
+                checkAPIAppVersionCamera()
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)

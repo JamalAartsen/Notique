@@ -146,7 +146,7 @@ class EditNote : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickImageFromGalery(this)
                 } else {
-                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
         }

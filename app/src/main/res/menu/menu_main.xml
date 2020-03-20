@@ -7,7 +7,18 @@
         android:id="@+id/action_bijlage"
         android:title="@string/bijlage"
         android:icon="@drawable/ic_attachment"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item android:id="@+id/gallery_foto"
+                android:title="Gallery"
+                android:icon="@drawable/ic_file"/>
+
+            <item android:id="@+id/camera_foto"
+                android:title="Camera"
+                android:icon="@drawable/ic_photo_camera"/>
+        </menu>
+    </item>
 
     <item
         android:id="@+id/action_share"

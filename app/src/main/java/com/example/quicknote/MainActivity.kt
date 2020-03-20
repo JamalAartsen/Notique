@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             })
         }
 
+        //NoteViewModel
         noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         noteViewModel.allNotes.observe(this, Observer<MutableList<Note>> { notes ->
             this.notes = notes
@@ -86,7 +87,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (notes.isEmpty()) {
                 recyclerView.visibility = View.GONE
                 snow_fall.visibility = View.GONE
-                //linear_layout_no_notes.visibility = View.VISIBLE
                 slideViewUp(linear_layout_no_notes)
             } else {
                 recyclerView.visibility = View.VISIBLE
