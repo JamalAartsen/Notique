@@ -81,26 +81,6 @@ class AddNote : AppCompatActivity() {
         }
     }
 
-    private fun checkAPIAppVersion() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-                val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                requestPermissions(permissions, PERMISSION_CODE_IMAGE_GALERY)
-            } else {
-                pickImageFromGalery(this)
-            }
-        } else {
-            // System OS is lower than m
-            if (PermissionChecker.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PermissionChecker.PERMISSION_DENIED) {
-                val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE_IMAGE_GALERY)
-            } else {
-                pickImageFromGalery(this)
-            }
-        }
-    }
-
     private fun checkAPIAppVersionCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
@@ -217,7 +197,7 @@ class AddNote : AppCompatActivity() {
                 return true
             }
             R.id.gallery_foto -> {
-                checkAPIAppVersion()
+                checkAPIAppVersionGalery(applicationContext, this, this)
                 return true
             }
             R.id.camera_foto -> {

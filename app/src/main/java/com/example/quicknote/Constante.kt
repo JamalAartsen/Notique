@@ -1,17 +1,22 @@
 package com.example.quicknote
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.Menu
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.PermissionChecker
 import androidx.fragment.app.FragmentActivity
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -125,3 +130,24 @@ fun imageToByteArray(image_note: ImageView?): ByteArray {
 
     return baos.toByteArray()
 }
+
+fun checkAPIAppVersionGalery(context: Context, activity: Activity, fragmentActivity: FragmentActivity) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            activity.requestPermissions(permissions, PERMISSION_CODE_IMAGE_GALERY)
+        } else {
+            pickImageFromGalery(fragmentActivity)
+        }
+    } else {
+        // System OS is lower than m
+        if (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            PermissionChecker.PERMISSION_DENIED) {
+            val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_CODE_IMAGE_GALERY)
+        } else {
+            pickImageFromGalery(fragmentActivity)
+        }
+    }
+}
+
