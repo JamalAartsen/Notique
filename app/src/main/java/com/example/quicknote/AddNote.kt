@@ -3,6 +3,7 @@ package com.example.quicknote
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -149,6 +150,11 @@ class AddNote : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_CODE_CAMERA) {
             image_note.visibility = View.VISIBLE
             Glide.with(this).load(currentPhotoPath).into(image_note)
+
+            // Returns een uri van de current Path
+            MediaScannerConnection.scanFile(this, arrayOf(currentPhotoPath), null) { path, uri ->
+                imageUri = uri
+            }
         }
     }
 

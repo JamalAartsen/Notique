@@ -17,15 +17,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name=".WidgetExample">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_example_info" />
-        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -37,7 +28,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".PrivacyPolicyAcivity"></activity>
+        <activity android:name=".PrivacyPolicyAcivity" />
         <activity
             android:name=".SplashScreen"
             android:theme="@style/SplashTheme">

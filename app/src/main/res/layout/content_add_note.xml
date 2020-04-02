@@ -27,7 +27,7 @@
                 android:hint="@string/title_add_note"
                 android:padding="10dp"
                 android:textSize="20sp"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 tools:ignore="Autofill"/>
 
             <View
@@ -44,8 +44,8 @@
                 android:hint="@string/description_add_note"
                 android:padding="10dp"
                 android:textSize="20sp"
-                android:inputType="text"
-                tools:ignore="Autofill"/>
+                android:inputType="textMultiLine"
+                tools:ignore="Autofill" />
 
             <ImageView
                 android:id="@+id/image_note"

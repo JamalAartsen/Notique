@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -58,7 +59,7 @@ fun shareImageFromUri(imageUri: Uri?, context: Context, titleNote: String, descr
                 type = "image/*"
                 putExtra(Intent.EXTRA_SUBJECT, "Look at my note!")
                 putExtra(Intent.EXTRA_TEXT, "$titleNote \n\n$descriptionNote")
-                putExtra(Intent.EXTRA_STREAM, getBitmapFromView(bitmap, context))
+                putExtra(Intent.EXTRA_STREAM, imageUri)
             }
             context.startActivity(Intent.createChooser(intent, context.getString(R.string.deel_note)))
         }
@@ -74,13 +75,33 @@ fun getBitmapFromView(bmp: Bitmap?, context: Context): Uri? {
         val out = FileOutputStream(file)
         bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
         out.close()
-        bmpUri = Uri.fromFile(file)
+        //bmpUri = Uri.fromFile(file)
+
+        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
+            bmpUri = uri
+        }
 
     } catch (e: IOException) {
         e.printStackTrace()
     }
     return bmpUri
 }
+
+//fun getUri(bmp: Bitmap?, context: Context): Uri? {
+//    var bmpUri: Uri? = null
+//    val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
+//    val out = FileOutputStream(file)
+//    bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
+//    out.close()
+//    //bmpUri = Uri.fromFile(file)
+//
+//    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
+//        bmpUri = uri
+//    }
+//
+//    return bmpUri
+//}
+
 fun hideIcon(id: Int, menu: Menu) {
     menu.findItem(id).apply {
         isVisible = false
@@ -123,12 +144,16 @@ fun deleteImage(image_note: ImageView, context: Context) {
     }
 }
 
-fun imageToByteArray(image_note: ImageView?): ByteArray {
-    val bitmap: Bitmap? = (image_note?.drawable as BitmapDrawable?)?.bitmap
-    val baos = ByteArrayOutputStream()
-    bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+fun imageToByteArray(image_note: ImageView?): ByteArray? {
+    if (image_note == null) {
+        return null
+    } else {
+        val bitmap: Bitmap? = (image_note?.drawable as BitmapDrawable?)?.bitmap
+        val baos = ByteArrayOutputStream()
+        bitmap?.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+        return baos.toByteArray()
+    }
 
-    return baos.toByteArray()
 }
 
 fun checkAPIAppVersionGalery(context: Context, activity: Activity, fragmentActivity: FragmentActivity) {

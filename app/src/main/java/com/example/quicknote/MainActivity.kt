@@ -24,6 +24,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.util.*
@@ -205,8 +206,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    //newText?.let { noteAdapter?.filter(it) }
-                    noteAdapter?.filter?.filter(newText)
+                    newText?.let { noteAdapter?.filter(it) }
+                    //noteAdapter?.filter?.filter(newText)
                     return false
                 }
             })

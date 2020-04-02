@@ -1,9 +1,12 @@
 package com.example.quicknote
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -23,6 +26,7 @@ import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.android.synthetic.main.content_edit_note.*
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,7 +35,6 @@ class EditNote : AppCompatActivity() {
 
     var imageUri: Uri? = null
     lateinit var currentPhotoPath: String
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +59,9 @@ class EditNote : AppCompatActivity() {
             val bitmap =
                 BitmapFactory.decodeByteArray(note.imageUriNote, 0, note.imageUriNote!!.size)
 
-            imageUri = getBitmapFromView(bitmap, this)
+            val bitMapUri = getUri(bitmap, this)
+
+            imageUri = bitMapUri
 
             image_note_edit.apply {
                 visibility = View.VISIBLE
@@ -94,6 +99,21 @@ class EditNote : AppCompatActivity() {
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
         menuInflater.inflate(R.menu.menu_image, menu)
+    }
+
+    fun getUri(bmp: Bitmap?, context: Context): Uri? {
+        var bmpUri: Uri? = null
+        val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
+        val out = FileOutputStream(file)
+        bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
+        out.close()
+        //bmpUri = Uri.fromFile(file)
+
+        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
+            imageUri = uri
+        }
+
+        return bmpUri
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -159,6 +179,11 @@ class EditNote : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK && requestCode == IMAGE_CODE_CAMERA) {
             image_note_edit.visibility = View.VISIBLE
             Glide.with(this).load(currentPhotoPath).into(image_note_edit)
+
+            // Returns een uri van de current Path
+            MediaScannerConnection.scanFile(this, arrayOf(currentPhotoPath), null) { path, uri ->
+                imageUri = uri
+            }
         }
     }
 
