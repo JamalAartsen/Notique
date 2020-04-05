@@ -75,32 +75,13 @@ fun getBitmapFromView(bmp: Bitmap?, context: Context): Uri? {
         val out = FileOutputStream(file)
         bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
         out.close()
-        //bmpUri = Uri.fromFile(file)
-
-        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
-            bmpUri = uri
-        }
+        bmpUri = Uri.fromFile(file)
 
     } catch (e: IOException) {
         e.printStackTrace()
     }
     return bmpUri
 }
-
-//fun getUri(bmp: Bitmap?, context: Context): Uri? {
-//    var bmpUri: Uri? = null
-//    val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
-//    val out = FileOutputStream(file)
-//    bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
-//    out.close()
-//    //bmpUri = Uri.fromFile(file)
-//
-//    MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
-//        bmpUri = uri
-//    }
-//
-//    return bmpUri
-//}
 
 fun hideIcon(id: Int, menu: Menu) {
     menu.findItem(id).apply {

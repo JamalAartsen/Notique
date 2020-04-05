@@ -55,20 +55,24 @@ class EditNote : AppCompatActivity() {
         val currentDate: String =
             SimpleDateFormat(getString(R.string.date_format), Locale.getDefault()).format(Date())
 
-        if (note?.imageUriNote?.size != null) {
-            val bitmap =
-                BitmapFactory.decodeByteArray(note.imageUriNote, 0, note.imageUriNote!!.size)
+        if (note != null) {
+            if (note.imageUriNote?.isNotEmpty()!!) {
+                val bitmap =
+                    BitmapFactory.decodeByteArray(note.imageUriNote, 0, note.imageUriNote!!.size)
 
-            val bitMapUri = getUri(bitmap, this)
+                val pathFileImage = getFile(bitmap, this)
 
-            imageUri = bitMapUri
+                MediaScannerConnection.scanFile(this, arrayOf(pathFileImage), null) { path, uri ->
+                    imageUri = uri
+                }
 
-            image_note_edit.apply {
-                visibility = View.VISIBLE
-                setImageBitmap(bitmap)
+                image_note_edit.apply {
+                    visibility = View.VISIBLE
+                    setImageBitmap(bitmap)
+                }
+            } else {
+                Log.d("ImageNull", "Image size is null")
             }
-        } else {
-            Log.d("ImageNull", "Image size is null")
         }
 
         fab.setOnClickListener {
@@ -96,24 +100,19 @@ class EditNote : AppCompatActivity() {
         registerForContextMenu(image_note_edit)
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-        menuInflater.inflate(R.menu.menu_image, menu)
-    }
-
-    fun getUri(bmp: Bitmap?, context: Context): Uri? {
-        var bmpUri: Uri? = null
+    fun getFile(bmp: Bitmap?, context: Context): String {
         val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
+
         val out = FileOutputStream(file)
         bmp?.compress(Bitmap.CompressFormat.JPEG, 90, out)
         out.close()
-        //bmpUri = Uri.fromFile(file)
 
-        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), null) { path, uri ->
-            imageUri = uri
-        }
+        return file.absolutePath
+    }
 
-        return bmpUri
+    override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        menuInflater.inflate(R.menu.menu_image, menu)
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {

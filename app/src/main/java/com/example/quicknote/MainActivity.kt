@@ -136,14 +136,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     notes.removeAt(position)
                     noteAdapter?.notifyItemRemoved(position)
 
-//                    when (actionMode) {
-//                        null -> {
-//                            // Start the CAB using the ActionMode.Callback defined above
-//                            actionMode = startActionMode(actionModeCallBack)
-//
-//                        }
-//                        else -> Log.d("Hello", "Hello")
-//                    }
                 }
 
                 override fun onClick(position: Int) {
@@ -161,36 +153,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         } else {
             noteAdapter?.swapList(notes)
         }
-    }
-
-    private val actionModeCallBack: ActionMode.Callback = object : ActionMode.Callback {
-        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-            when(item?.itemId) {
-                R.id.delete_note_list -> {
-                    Toast.makeText(applicationContext, "Notedelete", Toast.LENGTH_SHORT).show()
-                    mode?.finish()
-                }
-                else -> Log.d("Nothing", "")
-            }
-
-            return false
-        }
-
-        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            mode?.menuInflater?.inflate(R.menu.menu_action_mode, menu)
-            mode?.setTitle(noteAdapter?.allSelectedNotes())
-            return true
-        }
-
-        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            return false
-        }
-
-        override fun onDestroyActionMode(mode: ActionMode?) {
-            actionMode = null
-            noteAdapter?.clearAllHighLightedNotes()
-        }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
