@@ -3,33 +3,43 @@ package com.example.quicknote
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class NoteViewModel(application: Application): AndroidViewModel(application) {
+class NoteViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: NoteRepository
-    val allNotes: LiveData<MutableList<Note>>
-    val orderNotes: LiveData<MutableList<Note>>
+    private var repository: NoteRepository
+    var allNotes: LiveData<MutableList<Note>>
 
     init {
         val noteDao = NoteRoomDatabase.getDatabase(application).noteDao()
         repository = NoteRepository(noteDao)
         allNotes = repository.allNote
-        orderNotes = repository.orderAllNotes
+
     }
 
     fun insert(note: Note) {
-        repository.insert(note)
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.insert(note)
+        }
     }
 
     fun update(note: Note) {
-        repository.update(note)
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.update(note)
+        }
     }
 
     fun delete(note: Note) {
-        repository.delete(note)
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.delete(note)
+        }
     }
 
     fun deleteAllNotes() {
-        repository.deleteAllNotes()
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.deleteAllNotes()
+        }
     }
 }
