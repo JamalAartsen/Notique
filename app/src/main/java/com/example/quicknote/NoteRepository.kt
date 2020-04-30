@@ -1,14 +1,12 @@
 package com.example.quicknote
 
 import androidx.lifecycle.LiveData
+import kotlinx.coroutines.delay
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+// Isolates data. Provides clean api. Allows you to use multiple backends
 class NoteRepository(private val noteDao: NoteDao) {
-
-    private val mExecutor: Executor =
-        Executors.newSingleThreadExecutor() as Executor
-
     val allNote: LiveData<MutableList<Note>> = noteDao.getAllNotes()
 
     fun insert(note: Note) {

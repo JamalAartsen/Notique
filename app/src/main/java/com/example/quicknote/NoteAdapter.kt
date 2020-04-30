@@ -1,15 +1,14 @@
 package com.example.quicknote
 
 import android.content.Context
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.quicknote.common.Common
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.notes_row.view.*
 import java.util.*
@@ -26,6 +25,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
     private var selectedItem = false
     private var hashMapSelected = HashMap<Int, Boolean>()
     private var hashMapAllPositions = HashMap<Int, Int>()
+    private val undoPayload = 113421
 
     init {
         notesListSearch = ArrayList(notes)
@@ -55,17 +55,17 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
             selectedItem = true
             hashMapSelected[position] = selectedItem
             onClick.onLongPressDelete(holder.adapterPosition)
-            Snackbar.make(it, R.string.Note_deleted, Snackbar.LENGTH_LONG).apply {
-                setAction("Undo") {
-                    if (deletedPosition != RecyclerView.NO_POSITION) {
-                        notes.add(deletedPosition, deletedNote)
-                        notifyItemInserted(deletedPosition)
-                        addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
-                        dismiss()
-                    }
-                }
-                show()
-            }
+//            Snackbar.make(it, R.string.Note_deleted, Snackbar.LENGTH_LONG).apply {
+//                setAction("Undo") {
+//                    if (deletedPosition != RecyclerView.NO_POSITION) {
+//                        notes.add(deletedPosition, deletedNote)
+//                        notifyItemInserted(deletedPosition)
+//                        addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
+//                        dismiss()
+//                    }
+//                }
+//                show()
+//            }
             true
         }
 
@@ -76,6 +76,33 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
             }
             Log.d("ClickPosition", "${holder.adapterPosition}")
         }
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(undoPayload)) {
+            Toast.makeText(context, "Context jaja", Toast.LENGTH_SHORT).show()
+            Log.d("JamalJamal", "Payload werkt!")
+        }
+
+        onBindViewHolder(holder, position)
+    }
+
+    fun undoDeletSnackBar(view: View, position: Int) {
+//        Snackbar.make(view, "Jajaj", Snackbar.LENGTH_LONG).apply {
+//            setAction("Undo") {
+//                if (deletedPosition != RecyclerView.NO_POSITION) {
+//                    notes.add(deletedPosition, deletedNote)
+//                    notifyItemInserted(deletedPosition)
+//                    addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
+//                    dismiss()
+//                }
+//            }
+//            show()
+//        }
+
+        Log.d("PayloadExample", "EXAMPLE")
+
+        notifyItemChanged(position, undoPayload)
     }
 
     fun swapList(newList: MutableList<Note>) {

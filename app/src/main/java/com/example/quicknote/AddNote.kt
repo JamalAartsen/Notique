@@ -38,6 +38,7 @@ class AddNote : AppCompatActivity() {
         setContentView(R.layout.activity_add_note)
         setSupportActionBar(toolbar)
 
+        // Add back arrow to toolbar.
         if (supportActionBar != null) {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -47,6 +48,8 @@ class AddNote : AppCompatActivity() {
             SimpleDateFormat(getString(R.string.date_format), Locale.getDefault()).format(Date())
 
         fab.setOnClickListener {
+
+            // Send data to mainactivity/
             val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate, imageToByteArray(image_note) )
             if (note.titleNote.isEmpty()) {
                 Toast.makeText(this, R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
@@ -60,8 +63,10 @@ class AddNote : AppCompatActivity() {
             }
         }
 
+        // Registers a context menu to be shown for the given view.
         registerForContextMenu(image_note)
 
+        // Finds problems
         val builder: StrictMode.VmPolicy.Builder = StrictMode.VmPolicy.Builder()
         StrictMode.setVmPolicy(builder.build())
     }
@@ -82,6 +87,10 @@ class AddNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Check the api app version when you gonna use the camera. After that it checks if you already give
+     * permission to read your camera.
+     */
     private fun checkAPIAppVersionCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
@@ -104,6 +113,9 @@ class AddNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Open up the camera app on your phone.
+     */
     fun openCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Zorgt ervoor dat er een camera activity is die de intent aan kan
@@ -125,6 +137,9 @@ class AddNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Create a image file.
+     */
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name
@@ -189,6 +204,7 @@ class AddNote : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle clicks on toolbar.
         when(item.itemId) {
             R.id.action_share -> {
                 if (imageUri != null) {
@@ -199,7 +215,7 @@ class AddNote : AppCompatActivity() {
                 return true
             }
             android.R.id.home -> {
-                finish()
+                finish()  // Close this activity and return to preview activity.
                 return true
             }
             R.id.gallery_foto -> {
@@ -208,6 +224,7 @@ class AddNote : AppCompatActivity() {
             }
             R.id.camera_foto -> {
                 val packageManager: PackageManager = packageManager
+                // Checks if the phone of the user have a camera app.
                 if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
                     checkAPIAppVersionCamera()
                 } else {

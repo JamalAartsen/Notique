@@ -7,22 +7,25 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
-import android.view.ActionMode
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.load.engine.Resource
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
@@ -57,10 +60,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
+        // Listener that notify then there is a item selected in the navigationview.
         nav_view.setNavigationItemSelectedListener(this)
 
         // Shared Preferences
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE)
+
+        exampleButton.setOnClickListener {
+            fab.hide()
+            val jamal = findViewById<View>(R.id.coordinatorLayout)
+            noteAdapter?.undoDeletSnackBar(jamal, 1)
+            fab.handler.postDelayed({
+                Snackbar.make(
+                    findViewById(R.id.coordinatorLayout),
+                    "Jamal",
+                    Snackbar.LENGTH_SHORT
+                )
+                    .addCallback(object : Snackbar.Callback() {
+                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                            super.onDismissed(transientBottomBar, event)
+                            fab.show()
+                            fab.isEnabled = true
+                        }
+                    })
+                    .setAction("Undo") { showMessage() }
+                    .show()
+
+            }, 200)
+        }
 
         // Recyclerview opbouw
         recyclerView.apply {
@@ -107,6 +134,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    fun showMessage() {
+        Toast.makeText(this, "Hallooooo", Toast.LENGTH_SHORT).show()
+    }
+
     private fun slideViewUp(view: View) {
         view.viewTreeObserver.addOnGlobalLayoutListener(object : OnGlobalLayoutListener {
             override fun onGlobalLayout() {
@@ -128,14 +159,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
+    /**
+     *  Updates the recyclerview.
+     */
     private fun updateUI() {
         if (noteAdapter == null) {
             noteAdapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
                 override fun onLongPressDelete(position: Int) {
+                    fab.hide()
                     noteViewModel.delete(notes[position])
                     notes.removeAt(position)
                     noteAdapter?.notifyItemRemoved(position)
-
+                    val jamal = findViewById<View>(R.id.coordinatorLayout)
+                    noteAdapter?.undoDeletSnackBar(jamal, position)
                 }
 
                 override fun onClick(position: Int) {
@@ -160,6 +196,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         hideIcon(R.id.action_share, menu)
         hideIcon(R.id.action_bijlage, menu)
 
+        // SearchView
         val searchItem = menu.findItem(R.id.action_search)
         if (searchItem != null) {
             val searchView = searchItem.actionView as SearchView
@@ -180,6 +217,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle clicks on toolbar.
         when(item.itemId) {
             R.id.action_delete_notes -> popUpDialogDeleteAllNotes()
             R.id.action_filter_list -> showFilterDialog()
@@ -213,7 +251,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    // Word misschien in de adapter klasse gestopt.
+    /**
+     * Method that sort the recyclerview by A-Z, Z-A, date from newest and date from oldest.
+     * TODO Word misschien in de adapter klasse gestopt.
+     *
+     * @param value Type of sorting given. For example 1 or "Ascending" is sorting from A-Z.
+     */
     private fun <T> sortingMethod(value: T) {
         if (value == 0 || value == getString(R.string.ascending)) {
             notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toLowerCase(Locale.getDefault()).compareTo(o2.titleNote.toLowerCase(Locale.getDefault())) })
@@ -226,6 +269,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    /**
+     * Alertdialog that will be shown when you want to delete all the notes.
+     */
     private fun popUpDialogDeleteAllNotes() {
         val builder = AlertDialog.Builder(this).apply {
             setMessage(R.string.delete_all_notes_message)
@@ -240,6 +286,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         builder.create().show()
     }
 
+    /**
+     * Alertdialog that will be shown when you want to filter the recyclerview.
+     */
     private fun showFilterDialog() {
         selectedItemPosition = sharedPreferences.getInt(SELECTED_ITEM_POSITION_DIALOG_SORTING, -1)
         val alertDialog = AlertDialog.Builder(this).apply {
@@ -286,6 +335,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    // Navigation drawer.
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.nav_privacy -> {

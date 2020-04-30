@@ -41,6 +41,7 @@ class EditNote : AppCompatActivity() {
         setContentView(R.layout.activity_edit_note)
         setSupportActionBar(toolbar)
 
+        // Add back arrow to toolbar.
         if (supportActionBar != null) {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -56,12 +57,14 @@ class EditNote : AppCompatActivity() {
             SimpleDateFormat(getString(R.string.date_format), Locale.getDefault()).format(Date())
 
         if (note != null) {
+            // Set received image from database to imageView.
             if (note.imageUriNote?.isNotEmpty()!!) {
                 val bitmap =
                     BitmapFactory.decodeByteArray(note.imageUriNote, 0, note.imageUriNote!!.size)
 
                 val pathFileImage = getFile(bitmap, this)
 
+                // Returns een uri van de current Path
                 MediaScannerConnection.scanFile(this, arrayOf(pathFileImage), null) { path, uri ->
                     imageUri = uri
                 }
@@ -75,6 +78,7 @@ class EditNote : AppCompatActivity() {
             }
         }
 
+        // Send data to mainactivity.
         fab.setOnClickListener {
             note?.apply {
                 titleNote = title_edit_note.text.toString()
@@ -100,6 +104,12 @@ class EditNote : AppCompatActivity() {
         registerForContextMenu(image_note_edit)
     }
 
+    /**
+     * Returns the path of the image file.
+     *
+     * @param bmp This is the bitmap image.
+     * @param context
+     */
     fun getFile(bmp: Bitmap?, context: Context): String {
         val file = File(context.externalCacheDir, System.currentTimeMillis().toString() + ".jpg")
 
@@ -137,6 +147,7 @@ class EditNote : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle clicks on toolbar.
         when(item.itemId) {
             R.id.action_share -> {
                 if (imageUri != null) {
@@ -147,7 +158,7 @@ class EditNote : AppCompatActivity() {
                 return true
             }
             android.R.id.home -> {
-                finish()
+                finish() // Close this activity and return to preview activity
                 return true
             }
             R.id.gallery_foto -> {
@@ -206,6 +217,10 @@ class EditNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Check the api app version when you gonna use the camera. After that it checks if you already give
+     * permission to read your camera.
+     */
     private fun checkAPIAppVersionCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
@@ -228,6 +243,9 @@ class EditNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Open up the camera app on your phone.
+     */
     fun openCamera() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
             // Zorgt ervoor dat er een camera activity is die de intent aan kan
@@ -249,6 +267,9 @@ class EditNote : AppCompatActivity() {
         }
     }
 
+    /**
+     * Create a image file.
+     */
     @Throws(IOException::class)
     private fun createImageFile(): File {
         // Create an image file name

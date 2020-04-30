@@ -23,6 +23,9 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import java.io.*
 
+/**
+ * Constant Variables.
+ */
 const val ADD_REQUEST_CODE = 1
 const val SEND_NOTE_DATA = "sendNoteData"
 const val EDIT_REQUEST_CODE = 2
@@ -36,6 +39,13 @@ const val IMAGE_CODE_CAMERA = 1002
 const val PERMISSION_CODE_IMAGE_CAMERA = 1003
 const val PERMISSION_CODE_IMAGE_GALERY = 1001
 
+/**
+ * Shares data with a other app.
+ *
+ * @param titleNote The title of the note.
+ * @param descriptionNote The description of the note.
+ * @param context The context that you need to start a activity.
+ */
 fun shareData(titleNote: String, descriptionNote: String, context: Context) {
     val sendIntent: Intent = Intent(Intent.ACTION_SEND).apply {
         putExtra(Intent.EXTRA_SUBJECT, "Look at my note!")
@@ -46,6 +56,14 @@ fun shareData(titleNote: String, descriptionNote: String, context: Context) {
     context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.deel_note)))
 }
 
+/**
+ * Shares data with a image to a other app
+ *
+ * @param imageUri The uri of the image
+ * @param context The context that you need to start a activity.
+ * @param titleNote The title of the note.
+ * @param descriptionNote The description of the note.
+ */
 fun shareImageFromUri(imageUri: Uri?, context: Context, titleNote: String, descriptionNote: String) {
     Picasso.get().load(imageUri).into(object : Target {
         override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
@@ -83,12 +101,25 @@ fun getBitmapFromView(bmp: Bitmap?, context: Context): Uri? {
     return bmpUri
 }
 
+/**
+ * Hide icon in the toolbar.
+ *
+ * @param id The id of the icon.
+ * @param menu The options menu in which you place your items.
+ */
 fun hideIcon(id: Int, menu: Menu) {
     menu.findItem(id).apply {
         isVisible = false
     }
 }
 
+/**
+ * Set the image into the ImageView.
+ *
+ * @param context Gives the context of the activity so that you can use the openInputStream.
+ * @param data The dat you get from the onActivityResult method.
+ * @param image_note The id of the imageView.
+ */
 fun setImageToView(context: Context, data: Intent?, image_note: ImageView) {
     image_note.apply {
         visibility = View.VISIBLE
@@ -106,6 +137,11 @@ fun setImageToView(context: Context, data: Intent?, image_note: ImageView) {
     }
 }
 
+/**
+ * Get a Image from phone galery.
+ *
+ * @param fragmentActivity So that you can use startActivityForResult.
+ */
 fun pickImageFromGalery(fragmentActivity: FragmentActivity) {
     val intent = Intent(Intent.ACTION_PICK).apply {
         type = "image/*"
@@ -113,6 +149,12 @@ fun pickImageFromGalery(fragmentActivity: FragmentActivity) {
     fragmentActivity.startActivityForResult(intent, IMAGE_PICK_CODE_GALERY)
 }
 
+/**
+ * Delete image from ImageView.
+ *
+ * @param image_note The id of the imageView.
+ * @param context
+ */
 fun deleteImage(image_note: ImageView, context: Context) {
     if (image_note.drawable == null) {
         Log.d("Image", "Image is null.")
@@ -125,6 +167,11 @@ fun deleteImage(image_note: ImageView, context: Context) {
     }
 }
 
+/**
+ * Convert image to byteArray.
+ *
+ * @param image_note The id of the imageView.
+ */
 fun imageToByteArray(image_note: ImageView?): ByteArray? {
     if (image_note == null) {
         return null
@@ -137,6 +184,14 @@ fun imageToByteArray(image_note: ImageView?): ByteArray? {
 
 }
 
+/**
+ * Check the api app version when you gonna use the galery. After that it checks if you already give
+ * permission to read your galery.
+ *
+ * @param context
+ * @param activity
+ * @param fragmentActivity
+ */
 fun checkAPIAppVersionGalery(context: Context, activity: Activity, fragmentActivity: FragmentActivity) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {

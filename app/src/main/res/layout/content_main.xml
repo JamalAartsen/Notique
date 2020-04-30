@@ -7,6 +7,7 @@
     app:background="@color/backGroundColorActivity"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".MainActivity"
+    android:id="@+id/contentMain"
     tools:showIn="@layout/activity_main">
 
     <com.jetradarmobile.snowfall.SnowfallView
@@ -25,6 +26,11 @@
         app:snowflakesFadingEnabled="false"
         app:snowflakesNum="100">
     </com.jetradarmobile.snowfall.SnowfallView>
+
+    <Button
+        android:id="@+id/exampleButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
