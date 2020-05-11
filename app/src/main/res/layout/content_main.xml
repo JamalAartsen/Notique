@@ -27,11 +27,6 @@
         app:snowflakesNum="100">
     </com.jetradarmobile.snowfall.SnowfallView>
 
-    <Button
-        android:id="@+id/exampleButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

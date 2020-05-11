@@ -23,21 +23,20 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.*
 import com.bumptech.glide.load.engine.Resource
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import kotlinx.android.synthetic.main.main.*
+import java.lang.IndexOutOfBoundsException
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private var actionMode: ActionMode? = null
     private var notes: MutableList<Note> = ArrayList()
     private var noteAdapter: NoteAdapter? = null
     private lateinit var noteViewModel: NoteViewModel
@@ -51,6 +50,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main)
         setSupportActionBar(toolbar)
+
+//        notes.add(Note(Random().nextInt(), "Example", "Dit is een hardcoded notitie.", "04-05-2020", null))
+//        notes.add(Note(Random().nextInt(), "kayo", "Dit is een hardcoded notitie.", "04-05-2020", null))
+//        notes.add(Note(Random().nextInt(), "jamal", "Dit is een hardcoded notitie.", "04-05-2020", null))
+//        notes.add(Note(Random().nextInt(), "hallooooo", "Dit is een hardcoded notitie.", "04-05-2020", null))
 
         // Navigation Drawer
         drawerLayout = drawer_layout
@@ -66,53 +70,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Shared Preferences
         sharedPreferences = getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE)
 
-        exampleButton.setOnClickListener {
-            fab.hide()
-            val jamal = findViewById<View>(R.id.coordinatorLayout)
-            noteAdapter?.undoDeletSnackBar(jamal, 1)
-            fab.handler.postDelayed({
-                Snackbar.make(
-                    findViewById(R.id.coordinatorLayout),
-                    "Jamal",
-                    Snackbar.LENGTH_SHORT
-                )
-                    .addCallback(object : Snackbar.Callback() {
-                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                            super.onDismissed(transientBottomBar, event)
-                            fab.show()
-                            fab.isEnabled = true
-                        }
-                    })
-                    .setAction("Undo") { showMessage() }
-                    .show()
-
-            }, 200)
-        }
+        setUpAdapter()
 
         // Recyclerview opbouw
         recyclerView.apply {
             setHasFixedSize(true)
-            layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-            adapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
-                override fun onLongPressDelete(position: Int) {
-
-                }
-
-                override fun onClick(position: Int) {
-
-                }
-            }, object : InsertDeleteNote {
-                override fun insertDeletedNote(position: Int, note: Note) {
-
-                }
-            })
+            layoutManager = WrapContentGridLayoutManager(applicationContext, 2)
+            adapter = noteAdapter
+            itemAnimator = DefaultItemAnimator()
         }
 
         //NoteViewModel
         noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
         noteViewModel.allNotes.observe(this, Observer<MutableList<Note>> { notes ->
             this.notes = notes
-            updateUI()
+            noteAdapter?.swapList(notes)
             if (notes.isEmpty()) {
                 recyclerView.visibility = View.GONE
                 snow_fall.visibility = View.GONE
@@ -132,10 +104,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val intentAddNote = Intent(this, AddNote::class.java)
             startActivityForResult(intentAddNote, ADD_REQUEST_CODE)
         }
-    }
-
-    fun showMessage() {
-        Toast.makeText(this, "Hallooooo", Toast.LENGTH_SHORT).show()
     }
 
     private fun slideViewUp(view: View) {
@@ -160,35 +128,53 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     /**
-     *  Updates the recyclerview.
+     * Set up the adapter.
      */
-    private fun updateUI() {
-        if (noteAdapter == null) {
-            noteAdapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
-                override fun onLongPressDelete(position: Int) {
-                    fab.hide()
-                    noteViewModel.delete(notes[position])
-                    notes.removeAt(position)
-                    noteAdapter?.notifyItemRemoved(position)
-                    val jamal = findViewById<View>(R.id.coordinatorLayout)
-                    noteAdapter?.undoDeletSnackBar(jamal, position)
-                }
+    private fun setUpAdapter() {
+        noteAdapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
+            override fun onLongPressDelete(position: Int, deletedPosition: Int, deletedNote: Note) {
+                fab.hide()
+                noteViewModel.delete(notes[position])
+                notes.removeAt(position)
+                noteAdapter?.deleteItem(position)
 
-                override fun onClick(position: Int) {
-                    val intentEditNote = Intent(applicationContext, EditNote::class.java).apply {
-                        putExtra(SEND_DATA_EDIT_NOTE, position.let { notes[it] })
+                fab.handler.postDelayed({
+                    Snackbar.make(
+                        findViewById(R.id.coordinatorLayout),
+                        R.string.Note_deleted,
+                        Snackbar.LENGTH_LONG
+                    ).apply {
+                        // Insert deleted note back to his original position.
+                        setAction("Undo") {
+                            if (deletedPosition != RecyclerView.NO_POSITION) {
+                                notes.add(deletedPosition, deletedNote)
+                                noteAdapter?.notifyItemInserted(deletedPosition)
+                                noteAdapter?.insertDeletedNote(deletedPosition, deletedNote)
+                                dismiss()
+                            }
+                        }
+                        addCallback(object: Snackbar.Callback() {
+                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                                // Shows fab button back when the snackbar message is gone.
+                                fab.show()
+                            }
+                        })
+                        show()
                     }
-                    startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
+                }, 200)
+            }
+
+            override fun onClick(position: Int) {
+                val intentEditNote = Intent(applicationContext, EditNote::class.java).apply {
+                    putExtra(SEND_DATA_EDIT_NOTE, position.let { notes[it] })
                 }
-            }, object : InsertDeleteNote {
-                override fun insertDeletedNote(position: Int, note: Note) {
-                    noteViewModel.insert(note)
-                }
-            })
-            recyclerView.adapter = noteAdapter
-        } else {
-            noteAdapter?.swapList(notes)
-        }
+                startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
+            }
+        }, object : InsertDeleteNote {
+            override fun insertDeletedNote(position: Int, note: Note) {
+                noteViewModel.insert(note)
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -206,6 +192,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
+                    // TODO Checken welke het beste is.
                     newText?.let { noteAdapter?.filter(it) }
                     //noteAdapter?.filter?.filter(newText)
                     return false
@@ -245,6 +232,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    /**
+     * Saves position that iis clicked in de sorting alertdialog.
+     *
+     * @param isClickedPosition The position that is clicked inside de sorting alertdialog.
+     */
     private fun saveIsClickPreferences(isClickedPosition: Int) {
         isClickPosition = isClickedPosition
         sharedPreferences.edit().putInt(POSITION_SORTING, isClickedPosition).apply()
@@ -260,12 +252,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun <T> sortingMethod(value: T) {
         if (value == 0 || value == getString(R.string.ascending)) {
             notes.sortWith(Comparator { o1, o2 -> o1.titleNote.toLowerCase(Locale.getDefault()).compareTo(o2.titleNote.toLowerCase(Locale.getDefault())) })
+            //TODO Checken of dit werkt
+            noteViewModel.sortAllNotesASC()
         } else if (value == 1 || value == getString(R.string.descending)) {
             notes.sortWith(Comparator { o1, o2 -> o2.titleNote.toLowerCase(Locale.getDefault()).compareTo(o1.titleNote.toLowerCase(Locale.getDefault())) })
         } else if (value == 2 || value == getString(R.string.date_newest)) {
             notes.sortWith(compareByDescending<Note> { it.dateNote }.thenBy { it.titleNote })
-        } else {
+        } else if (value == 3 || value == getString(R.string.date_oldest)) {
             notes.sortWith(compareBy<Note> { it.dateNote }.thenBy { it.titleNote })
+        } else {
+            Log.d("Sorting", "Different value $value")
         }
     }
 
@@ -298,30 +294,36 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 sharedPreferences.edit().putInt(SELECTED_ITEM_POSITION_DIALOG_SORTING, which).apply()
                 items = arrayListOf(getString(R.string.ascending), getString(R.string.descending),
                     getString(R.string.date_newest), getString(R.string.date_oldest))
-                when (which) {
-                    0 -> {
-                        sortingMethod(items[which])
-                        updateUI()
-                        saveIsClickPreferences(which)
-                    }
-                    1 -> {
-                        sortingMethod(items[which])
-                        updateUI()
-                        saveIsClickPreferences(which)
-                    }
-                    2 -> {
-                        sortingMethod(items[which])
-                        updateUI()
-                        saveIsClickPreferences(which)
-                    }
-                    3 -> {
-                        sortingMethod(items[which])
-                        updateUI()
-                        saveIsClickPreferences(which)
-                    }
-                }
+//                when (which) {
+//                    0 -> {
+//                        sortingMethod(items[which])
+//                        saveIsClickPreferences(which)
+//                        noteAdapter?.updateSortedList(notes)
+//                    }
+//                    1 -> {
+//                        sortingMethod(items[which])
+//                        saveIsClickPreferences(which)
+//                        noteAdapter?.updateSortedList(notes)
+//                    }
+//                    2 -> {
+//                        sortingMethod(items[which])
+//                        saveIsClickPreferences(which)
+//                        noteAdapter?.updateSortedList(notes)
+//                    }
+//                    3 -> {
+//                        sortingMethod(items[which])
+//                        saveIsClickPreferences(which)
+//                        noteAdapter?.updateSortedList(notes)
+//                    }
+//                }
+                saveIsClickPreferences(which)
             }
-            setPositiveButton(R.string.sort) { dialog, _ -> dialog.cancel() }
+            setPositiveButton(R.string.sort) { dialog, _ ->
+                val postion = sharedPreferences.getInt(POSITION_SORTING, 13)
+                sortingMethod(items[postion])
+                noteAdapter?.updateSortedList(notes)
+                dialog.cancel()
+            }
             setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
         }
         alertDialog.create().show()
@@ -348,5 +350,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
+}
+
+class WrapContentGridLayoutManager(context: Context?, spanCount: Int) :
+    GridLayoutManager(context, spanCount) {
+
+    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+        try {
+            super.onLayoutChildren(recycler, state)
+        } catch (e: IndexOutOfBoundsException) {
+            Log.d("TAG", "$e")
+        }
     }
 }

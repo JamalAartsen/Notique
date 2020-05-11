@@ -1,61 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:background="@color/backGroundColorActivity"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".AddNote"
     tools:showIn="@layout/activity_add_note">
 
-    <androidx.cardview.widget.CardView
-        android:layout_margin="10dp"
+    <RelativeLayout
         android:layout_width="match_parent"
-        app:cardElevation="4dp"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_margin="10dp"
+            app:cardElevation="4dp">
 
-            <EditText
-                android:id="@+id/title_add_note"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:background="@color/background_cardview"
-                android:hint="@string/title_add_note"
-                android:padding="10dp"
-                android:textSize="20sp"
-                android:inputType="textMultiLine"
-                tools:ignore="Autofill"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/black" />
-
-            <EditText
-                android:id="@+id/description_add_note"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@color/background_cardview"
-                android:gravity="top"
-                android:hint="@string/description_add_note"
-                android:padding="10dp"
-                android:textSize="20sp"
-                android:inputType="textMultiLine"
-                tools:ignore="Autofill" />
-
-            <ImageView
-                android:id="@+id/image_note"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:scaleType="centerInside"
                 android:layout_height="match_parent"
-                tools:ignore="ContentDescription"/>
+                android:orientation="vertical">
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</RelativeLayout>
+                <EditText
+                    android:id="@+id/title_add_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@color/background_cardview"
+                    android:hint="@string/title_add_note"
+                    android:inputType="textMultiLine"
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    tools:ignore="Autofill" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/black" />
+
+                <EditText
+                    android:id="@+id/description_add_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:background="@color/background_cardview"
+                    android:gravity="top"
+                    android:hint="@string/description_add_note"
+                    android:inputType="textMultiLine"
+                    android:padding="10dp"
+                    android:textSize="20sp"
+                    tools:ignore="Autofill" />
+
+                <ImageView
+                    android:id="@+id/image_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerInside"
+                    android:visibility="gone"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
+</ScrollView>

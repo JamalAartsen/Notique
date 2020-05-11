@@ -25,4 +25,8 @@ class NoteRepository(private val noteDao: NoteDao) {
         noteDao.deleteAllNotes()
         allNote
     }
+
+    fun sortNotesASC() {
+        noteDao.orderNotesASC()
+    }
 }

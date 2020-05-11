@@ -42,4 +42,10 @@ class NoteViewModel(application: Application) : AndroidViewModel(application) {
             repository.deleteAllNotes()
         }
     }
+
+    fun sortAllNotesASC() {
+        viewModelScope.launch(Dispatchers.Default) {
+            repository.sortNotesASC()
+        }
+    }
 }

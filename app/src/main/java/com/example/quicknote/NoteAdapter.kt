@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.notes_row.view.*
@@ -25,7 +26,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
     private var selectedItem = false
     private var hashMapSelected = HashMap<Int, Boolean>()
     private var hashMapAllPositions = HashMap<Int, Int>()
-    private val undoPayload = 113421
+    private val undoPayload = 11
 
     init {
         notesListSearch = ArrayList(notes)
@@ -54,18 +55,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
 
             selectedItem = true
             hashMapSelected[position] = selectedItem
-            onClick.onLongPressDelete(holder.adapterPosition)
-//            Snackbar.make(it, R.string.Note_deleted, Snackbar.LENGTH_LONG).apply {
-//                setAction("Undo") {
-//                    if (deletedPosition != RecyclerView.NO_POSITION) {
-//                        notes.add(deletedPosition, deletedNote)
-//                        notifyItemInserted(deletedPosition)
-//                        addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
-//                        dismiss()
-//                    }
-//                }
-//                show()
-//            }
+            onClick.onLongPressDelete(holder.adapterPosition, deletedPosition, deletedNote)
             true
         }
 
@@ -76,48 +66,39 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
             }
             Log.d("ClickPosition", "${holder.adapterPosition}")
         }
+        Log.d("Payload", "dw2f3wf")
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.contains(undoPayload)) {
-            Toast.makeText(context, "Context jaja", Toast.LENGTH_SHORT).show()
-            Log.d("JamalJamal", "Payload werkt!")
-        }
-
         onBindViewHolder(holder, position)
     }
 
-    fun undoDeletSnackBar(view: View, position: Int) {
-//        Snackbar.make(view, "Jajaj", Snackbar.LENGTH_LONG).apply {
-//            setAction("Undo") {
-//                if (deletedPosition != RecyclerView.NO_POSITION) {
-//                    notes.add(deletedPosition, deletedNote)
-//                    notifyItemInserted(deletedPosition)
-//                    addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
-//                    dismiss()
-//                }
-//            }
-//            show()
-//        }
-
-        Log.d("PayloadExample", "EXAMPLE")
-
-        notifyItemChanged(position, undoPayload)
-    }
 
     fun swapList(newList: MutableList<Note>) {
+//        val result = DiffUtil.calculateDiff(NoteListDiffUtilCallback(this.notes, newList))
+//        result.dispatchUpdatesTo(this)
         notes = newList
         notesListSearch = ArrayList(notes)
         notifyDataSetChanged()
     }
 
-    fun clearAllHighLightedNotes() {
-        notifyItemRangeChanged(0, hashMapAllPositions.size, "JAMAL")
-        Log.d("ClearNote", "All notes are clear highlight.")
+    fun deleteItem(position: Int) {
+        notifyItemRemoved(position)
     }
 
-    fun allSelectedNotes(): String {
-        return "${hashMapSelected.size}"
+    fun updateSortedList(newList: MutableList<Note>) {
+        notes = newList
+        notesListSearch = ArrayList(notes)
+        notifyDataSetChanged()
+    }
+
+    fun insertDeletedNote(deletedPosition: Int, deletedNote: Note) {
+        addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
+    }
+
+    fun insertHardcoded(newList: MutableList<Note>) {
+        notes = newList
+        notifyItemInserted(0)
     }
 
     fun filter(charText: String) {
@@ -182,7 +163,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
 }
 
 interface OnClickListener {
-    fun onLongPressDelete(position: Int)
+    fun onLongPressDelete(position: Int, deletedPosition: Int, deletedNote: Note)
     fun onClick(position: Int)
 }
 
@@ -190,3 +171,19 @@ interface InsertDeleteNote {
     fun insertDeletedNote(position: Int, note: Note)
 }
 
+class NoteListDiffUtilCallback(private var oldItems: MutableList<Note>, private var newItems: MutableList<Note>) : DiffUtil.Callback() {
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldItems[oldItemPosition].id == newItems[newItemPosition].id
+    }
+
+    override fun getOldListSize(): Int = oldItems.size
+
+    override fun getNewListSize(): Int = newItems.size
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val (_, value, name) = oldItems[oldItemPosition]
+        val (_, value1, name1) = newItems[newItemPosition]
+
+        return name == name1 && value == value1
+    }
+}
