@@ -1,9 +1,10 @@
-package com.example.quicknote
+package com.example.quicknote.Database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.quicknote.model.Note
 
 @Database(entities = [Note::class], version = 1)
 abstract class NoteRoomDatabase : RoomDatabase() {

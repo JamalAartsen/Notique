@@ -1,4 +1,4 @@
-package com.example.quicknote
+package com.example.quicknote.Activity
 
 import android.app.Activity
 import android.content.Context
@@ -23,6 +23,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import com.bumptech.glide.Glide
+import com.example.quicknote.*
+import com.example.quicknote.model.Note
 import kotlinx.android.synthetic.main.activity_edit_note.*
 import kotlinx.android.synthetic.main.content_edit_note.*
 import java.io.File
@@ -47,7 +49,9 @@ class EditNote : AppCompatActivity() {
             supportActionBar?.setDisplayShowHomeEnabled(true)
         }
 
-        val note = intent.getParcelableExtra<Note?>(SEND_DATA_EDIT_NOTE)
+        val note = intent.getParcelableExtra<Note?>(
+            SEND_DATA_EDIT_NOTE
+        )
         if (note != null) {
             title_edit_note.setText(note.titleNote)
             description_edit_note.setText(note.descriptionNote)
@@ -84,18 +88,21 @@ class EditNote : AppCompatActivity() {
                 titleNote = title_edit_note.text.toString()
                 descriptionNote = description_edit_note.text.toString()
                 dateNote = currentDate
-                imageUriNote = imageToByteArray(image_note_edit)
+                imageUriNote =
+                    imageToByteArray(image_note_edit)
             }
 
             if (note != null) {
                 if (note.titleNote.isEmpty()) {
-                    Toast.makeText(this, R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
                 } else {
                     val editIntent = Intent().apply {
                         putExtra(SEND_EDITED_NOTE, note)
                     }
 
-                    Toast.makeText(this, R.string.note_edited, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.note_edited, Toast.LENGTH_SHORT).show()
                     setResult(Activity.RESULT_OK, editIntent)
                 }
             }
@@ -128,7 +135,10 @@ class EditNote : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_delete_image -> {
-                deleteImage(image_note_edit, applicationContext)
+                deleteImage(
+                    image_note_edit,
+                    applicationContext
+                )
                 imageUri = null
                 true
             }
@@ -139,9 +149,18 @@ class EditNote : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        hideIcon(R.id.action_search, menu)
-        hideIcon(R.id.action_delete_notes, menu)
-        hideIcon(R.id.action_filter_list, menu)
+        hideIcon(
+            R.id.action_search,
+            menu
+        )
+        hideIcon(
+            R.id.action_delete_notes,
+            menu
+        )
+        hideIcon(
+            R.id.action_filter_list,
+            menu
+        )
 
         return true
     }
@@ -151,9 +170,18 @@ class EditNote : AppCompatActivity() {
         when(item.itemId) {
             R.id.action_share -> {
                 if (imageUri != null) {
-                    shareImageFromUri(imageUri, this, title_edit_note.text.toString(), description_edit_note.text.toString())
+                    shareImageFromUri(
+                        imageUri,
+                        this,
+                        title_edit_note.text.toString(),
+                        description_edit_note.text.toString()
+                    )
                 } else {
-                    shareData(title_edit_note.text.toString(), description_edit_note.text.toString(), this)
+                    shareData(
+                        title_edit_note.text.toString(),
+                        description_edit_note.text.toString(),
+                        this
+                    )
                 }
                 return true
             }
@@ -162,7 +190,11 @@ class EditNote : AppCompatActivity() {
                 return true
             }
             R.id.gallery_foto -> {
-                checkAPIAppVersionGalery(applicationContext, this, this)
+                checkAPIAppVersionAccesStorage(
+                    applicationContext,
+                    this,
+                    this
+                )
                 return true
             }
             R.id.camera_foto -> {
@@ -199,11 +231,12 @@ class EditNote : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
-            PERMISSION_CODE_IMAGE_GALERY -> {
+            PERMISSION_CODE_ACCES_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickImageFromGalery(this)
                 } else {
-                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -211,7 +244,8 @@ class EditNote : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openCamera()
                 } else {
-                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -226,7 +260,9 @@ class EditNote : AppCompatActivity() {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                 || checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
                 val permissions = arrayOf(android.Manifest.permission.CAMERA)
-                requestPermissions(permissions, PERMISSION_CODE_IMAGE_CAMERA)
+                requestPermissions(permissions,
+                    PERMISSION_CODE_IMAGE_CAMERA
+                )
             } else {
                 openCamera()
             }
@@ -236,7 +272,9 @@ class EditNote : AppCompatActivity() {
                 PermissionChecker.PERMISSION_DENIED || PermissionChecker.checkSelfPermission(this, android.Manifest.permission.CAMERA) ==
                 PermissionChecker.PERMISSION_DENIED) {
                 val permissions = arrayOf(android.Manifest.permission.CAMERA)
-                ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE_IMAGE_CAMERA)
+                ActivityCompat.requestPermissions(this, permissions,
+                    PERMISSION_CODE_IMAGE_CAMERA
+                )
             } else {
                 openCamera()
             }
@@ -261,7 +299,9 @@ class EditNote : AppCompatActivity() {
                 photoFile?.also {
                     val photoUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", it)
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                    startActivityForResult(takePictureIntent, IMAGE_CODE_CAMERA)
+                    startActivityForResult(takePictureIntent,
+                        IMAGE_CODE_CAMERA
+                    )
                 }
             }
         }

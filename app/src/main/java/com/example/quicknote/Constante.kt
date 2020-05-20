@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -37,7 +36,7 @@ const val SELECTED_ITEM_POSITION_DIALOG_SORTING = "selected_dialog_item_position
 const val IMAGE_PICK_CODE_GALERY = 1000
 const val IMAGE_CODE_CAMERA = 1002
 const val PERMISSION_CODE_IMAGE_CAMERA = 1003
-const val PERMISSION_CODE_IMAGE_GALERY = 1001
+const val PERMISSION_CODE_ACCES_STORAGE = 1001
 
 /**
  * Shares data with a other app.
@@ -192,11 +191,11 @@ fun imageToByteArray(image_note: ImageView?): ByteArray? {
  * @param activity
  * @param fragmentActivity
  */
-fun checkAPIAppVersionGalery(context: Context, activity: Activity, fragmentActivity: FragmentActivity) {
+fun checkAPIAppVersionAccesStorage(context: Context, activity: Activity, fragmentActivity: FragmentActivity) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (context.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
             val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-            activity.requestPermissions(permissions, PERMISSION_CODE_IMAGE_GALERY)
+            activity.requestPermissions(permissions, PERMISSION_CODE_ACCES_STORAGE)
         } else {
             pickImageFromGalery(fragmentActivity)
         }
@@ -205,7 +204,7 @@ fun checkAPIAppVersionGalery(context: Context, activity: Activity, fragmentActiv
         if (PermissionChecker.checkSelfPermission(context, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
             PermissionChecker.PERMISSION_DENIED) {
             val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_CODE_IMAGE_GALERY)
+            ActivityCompat.requestPermissions(activity, permissions, PERMISSION_CODE_ACCES_STORAGE)
         } else {
             pickImageFromGalery(fragmentActivity)
         }

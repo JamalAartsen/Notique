@@ -1,9 +1,8 @@
-package com.example.quicknote
+package com.example.quicknote.Activity
 
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -21,6 +20,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.PermissionChecker
 import com.bumptech.glide.Glide
+import com.example.quicknote.*
+import com.example.quicknote.model.Note
 import kotlinx.android.synthetic.main.activity_add_note.*
 import kotlinx.android.synthetic.main.content_add_note.*
 import java.io.File
@@ -51,15 +52,23 @@ class AddNote : AppCompatActivity() {
         fab.setOnClickListener {
 
             // Send data to mainactivity/
-            val note = Note(0, title_add_note.text.toString(), description_add_note.text.toString(), currentDate, imageToByteArray(image_note) )
+            val note = Note(
+                0,
+                title_add_note.text.toString(),
+                description_add_note.text.toString(),
+                currentDate,
+                imageToByteArray(image_note)
+            )
             if (note.titleNote.isEmpty()) {
-                Toast.makeText(this, R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    R.string.title_can_not_be_empty, Toast.LENGTH_SHORT).show()
             } else {
                 val intentSendData = Intent().apply {
                     putExtra(SEND_NOTE_DATA, note)
                 }
 
-                Toast.makeText(this, R.string.note_added, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,
+                    R.string.note_added, Toast.LENGTH_SHORT).show()
                 setResult(Activity.RESULT_OK, intentSendData)
             }
         }
@@ -92,22 +101,24 @@ class AddNote : AppCompatActivity() {
      * Check the api app version when you gonna use the camera. After that it checks if you already give
      * permission to read your camera.
      */
-    private fun checkAPIAppVersionCamera() {
+    private fun checkAPIAppVersionCameraAccesStorage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
-                || checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
-                val permissions = arrayOf(android.Manifest.permission.CAMERA)
-                requestPermissions(permissions, PERMISSION_CODE_IMAGE_CAMERA)
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                requestPermissions(permissions,
+                    PERMISSION_CODE_IMAGE_CAMERA
+                )
             } else {
                 openCamera()
             }
         } else {
             // System OS is lower than m
-            if (PermissionChecker.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PermissionChecker.PERMISSION_DENIED || PermissionChecker.checkSelfPermission(this, android.Manifest.permission.CAMERA) ==
+            if (PermissionChecker.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
                 PermissionChecker.PERMISSION_DENIED) {
-                val permissions = arrayOf(android.Manifest.permission.CAMERA)
-                ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE_IMAGE_CAMERA)
+                val permissions = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                ActivityCompat.requestPermissions(this, permissions,
+                    PERMISSION_CODE_IMAGE_CAMERA
+                )
             } else {
                 openCamera()
             }
@@ -132,7 +143,9 @@ class AddNote : AppCompatActivity() {
                 photoFile?.also {
                     val photoUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", it)
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                    startActivityForResult(takePictureIntent, IMAGE_CODE_CAMERA)
+                    startActivityForResult(takePictureIntent,
+                        IMAGE_CODE_CAMERA
+                    )
                 }
             }
         }
@@ -176,11 +189,12 @@ class AddNote : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
-            PERMISSION_CODE_IMAGE_GALERY -> {
+            PERMISSION_CODE_ACCES_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickImageFromGalery(this)
                 } else {
-                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -188,7 +202,8 @@ class AddNote : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openCamera()
                 } else {
-                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this,
+                        R.string.permission_denied, Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -197,9 +212,18 @@ class AddNote : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
 
-        hideIcon(R.id.action_search, menu)
-        hideIcon(R.id.action_delete_notes, menu)
-        hideIcon(R.id.action_filter_list, menu)
+        hideIcon(
+            R.id.action_search,
+            menu
+        )
+        hideIcon(
+            R.id.action_delete_notes,
+            menu
+        )
+        hideIcon(
+            R.id.action_filter_list,
+            menu
+        )
 
         return true
     }
@@ -209,9 +233,18 @@ class AddNote : AppCompatActivity() {
         when(item.itemId) {
             R.id.action_share -> {
                 if (imageUri != null) {
-                    shareImageFromUri(imageUri, this, title_add_note.text.toString(), description_add_note.text.toString())
+                    shareImageFromUri(
+                        imageUri,
+                        this,
+                        title_add_note.text.toString(),
+                        description_add_note.text.toString()
+                    )
                 } else {
-                    shareData(title_add_note.text.toString(), description_add_note.text.toString(), this)
+                    shareData(
+                        title_add_note.text.toString(),
+                        description_add_note.text.toString(),
+                        this
+                    )
                 }
                 return true
             }
@@ -220,14 +253,18 @@ class AddNote : AppCompatActivity() {
                 return true
             }
             R.id.gallery_foto -> {
-                checkAPIAppVersionGalery(applicationContext, this, this)
+                checkAPIAppVersionAccesStorage(
+                    applicationContext,
+                    this,
+                    this
+                )
                 return true
             }
             R.id.camera_foto -> {
                 val packageManager: PackageManager = packageManager
                 // Checks if the phone of the user have a camera app.
                 if (packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
-                    checkAPIAppVersionCamera()
+                    checkAPIAppVersionCameraAccesStorage()
                 } else {
                     Toast.makeText(this, "You don't have a camera app.", Toast.LENGTH_SHORT).show()
                 }

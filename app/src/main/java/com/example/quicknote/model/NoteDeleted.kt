@@ -1,4 +1,4 @@
-package com.example.quicknote
+package com.example.quicknote.model
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -7,7 +7,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "note_table")
-data class Note(@PrimaryKey(autoGenerate = true) val id: Int,
+data class NoteDeleted(@PrimaryKey(autoGenerate = true) val id: Int,
                 @ColumnInfo(name = "title_note") var titleNote: String,
                 @ColumnInfo(name = "description_note") var descriptionNote: String?,
                 @ColumnInfo(name = "date-note") var dateNote: String?,

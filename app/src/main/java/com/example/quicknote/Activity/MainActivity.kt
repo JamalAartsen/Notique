@@ -1,4 +1,4 @@
-package com.example.quicknote
+package com.example.quicknote.Activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -7,24 +7,20 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.*
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
-import com.bumptech.glide.load.engine.Resource
+import com.example.quicknote.*
+import com.example.quicknote.model.Note
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
@@ -59,7 +55,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Navigation Drawer
         drawerLayout = drawer_layout
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar,
-            R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
 
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
@@ -75,7 +73,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Recyclerview opbouw
         recyclerView.apply {
             setHasFixedSize(true)
-            layoutManager = WrapContentGridLayoutManager(applicationContext, 2)
+            layoutManager =
+                WrapContentGridLayoutManager(
+                    applicationContext,
+                    2
+                )
             adapter = noteAdapter
             itemAnimator = DefaultItemAnimator()
         }
@@ -102,7 +104,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         fab.setOnClickListener {
             val intentAddNote = Intent(this, AddNote::class.java)
-            startActivityForResult(intentAddNote, ADD_REQUEST_CODE)
+            startActivityForResult(intentAddNote,
+                ADD_REQUEST_CODE
+            )
         }
     }
 
@@ -131,56 +135,81 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * Set up the adapter.
      */
     private fun setUpAdapter() {
-        noteAdapter = NoteAdapter(notes, applicationContext, object : OnClickListener {
-            override fun onLongPressDelete(position: Int, deletedPosition: Int, deletedNote: Note) {
-                fab.hide()
-                noteViewModel.delete(notes[position])
-                notes.removeAt(position)
-                noteAdapter?.deleteItem(position)
+        noteAdapter = NoteAdapter(
+            notes,
+            applicationContext,
+            object : OnClickListener {
+                override fun onLongPressDelete(
+                    position: Int,
+                    deletedPosition: Int,
+                    deletedNote: Note
+                ) {
+                    fab.hide()
+                    noteViewModel.delete(notes[position])
+                    notes.removeAt(position)
+                    noteAdapter?.deleteItem(position)
 
-                fab.handler.postDelayed({
-                    Snackbar.make(
-                        findViewById(R.id.coordinatorLayout),
-                        R.string.Note_deleted,
-                        Snackbar.LENGTH_LONG
-                    ).apply {
-                        // Insert deleted note back to his original position.
-                        setAction("Undo") {
-                            if (deletedPosition != RecyclerView.NO_POSITION) {
-                                notes.add(deletedPosition, deletedNote)
-                                noteAdapter?.notifyItemInserted(deletedPosition)
-                                noteAdapter?.insertDeletedNote(deletedPosition, deletedNote)
-                                dismiss()
+                    fab.handler.postDelayed({
+                        Snackbar.make(
+                            findViewById(R.id.coordinatorLayout),
+                            R.string.Note_deleted,
+                            Snackbar.LENGTH_LONG
+                        ).apply {
+                            // Insert deleted note back to his original position.
+                            setAction("Undo") {
+                                if (deletedPosition != RecyclerView.NO_POSITION) {
+                                    notes.add(deletedPosition, deletedNote)
+                                    noteAdapter?.notifyItemInserted(deletedPosition)
+                                    noteAdapter?.insertDeletedNote(deletedPosition, deletedNote)
+                                    dismiss()
+                                }
                             }
+                            addCallback(object : Snackbar.Callback() {
+                                override fun onDismissed(
+                                    transientBottomBar: Snackbar?,
+                                    event: Int
+                                ) {
+                                    // Shows fab button back when the snackbar message is gone.
+                                    fab.show()
+                                }
+                            })
+                            show()
                         }
-                        addCallback(object: Snackbar.Callback() {
-                            override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                                // Shows fab button back when the snackbar message is gone.
-                                fab.show()
-                            }
-                        })
-                        show()
-                    }
-                }, 200)
-            }
-
-            override fun onClick(position: Int) {
-                val intentEditNote = Intent(applicationContext, EditNote::class.java).apply {
-                    putExtra(SEND_DATA_EDIT_NOTE, position.let { notes[it] })
+                    }, 200)
                 }
-                startActivityForResult(intentEditNote, EDIT_REQUEST_CODE)
-            }
-        }, object : InsertDeleteNote {
-            override fun insertDeletedNote(position: Int, note: Note) {
-                noteViewModel.insert(note)
-            }
-        })
+
+                override fun onClick(position: Int) {
+                    val intentEditNote = Intent(applicationContext, EditNote::class.java).apply {
+                        putExtra(
+                            SEND_DATA_EDIT_NOTE,
+                            position.let { notes[it] })
+                    }
+                    startActivityForResult(
+                        intentEditNote,
+                        EDIT_REQUEST_CODE
+                    )
+                }
+            },
+            object : InsertDeleteNote {
+                override fun insertDeletedNote(
+                    position: Int,
+                    note: Note
+                ) {
+                    noteViewModel.insert(note)
+                }
+            })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        hideIcon(R.id.action_share, menu)
-        hideIcon(R.id.action_bijlage, menu)
+        hideIcon(
+            R.id.action_share,
+            menu
+        )
+        hideIcon(
+            R.id.action_bijlage,
+            menu
+        )
 
         // SearchView
         val searchItem = menu.findItem(R.id.action_search)
@@ -218,14 +247,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (requestCode == ADD_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                val addNote: Note? = data?.getParcelableExtra(SEND_NOTE_DATA)
+                val addNote: Note? = data?.getParcelableExtra(
+                    SEND_NOTE_DATA
+                )
                 addNote?.let { noteViewModel.insert(it) }
             }
         }
 
         if (requestCode == EDIT_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                val editNote: Note? = data?.getParcelableExtra(SEND_EDITED_NOTE)
+                val editNote: Note? = data?.getParcelableExtra(
+                    SEND_EDITED_NOTE
+                )
                 editNote?.titleNote
                 editNote?.let { noteViewModel.update(it) }
             }
@@ -292,8 +325,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             setIcon(R.drawable.ic_filter_list)
             setSingleChoiceItems(R.array.filter_notes, selectedItemPosition) { dialog, which ->
                 sharedPreferences.edit().putInt(SELECTED_ITEM_POSITION_DIALOG_SORTING, which).apply()
-                items = arrayListOf(getString(R.string.ascending), getString(R.string.descending),
-                    getString(R.string.date_newest), getString(R.string.date_oldest))
+                items = arrayListOf(getString(R.string.ascending), getString(
+                    R.string.descending
+                ),
+                    getString(R.string.date_newest), getString(
+                        R.string.date_oldest
+                    ))
 //                when (which) {
 //                    0 -> {
 //                        sortingMethod(items[which])

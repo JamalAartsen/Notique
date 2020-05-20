@@ -1,4 +1,4 @@
-package com.example.quicknote
+package com.example.quicknote.Activity
 
 import android.content.Intent
 import android.os.Bundle

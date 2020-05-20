@@ -1,8 +1,9 @@
-package com.example.quicknote
+package com.example.quicknote.Activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import com.example.quicknote.R
 
 class PrivacyPolicyAcivity : AppCompatActivity() {
 

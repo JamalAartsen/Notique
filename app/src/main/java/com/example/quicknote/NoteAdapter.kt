@@ -1,7 +1,6 @@
 package com.example.quicknote
 
 import android.content.Context
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
+import com.example.quicknote.model.Note
 import kotlinx.android.synthetic.main.notes_row.view.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -22,7 +21,8 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
 
     private var notesListSearch: MutableList<Note>
     private var deletedPosition: Int = 0
-    private var deletedNote: Note = Note(0, "", "", "", null)
+    private var deletedNote: Note =
+        Note(0, "", "", "", null)
     private var selectedItem = false
     private var hashMapSelected = HashMap<Int, Boolean>()
     private var hashMapAllPositions = HashMap<Int, Int>()
@@ -75,11 +75,11 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
 
 
     fun swapList(newList: MutableList<Note>) {
-//        val result = DiffUtil.calculateDiff(NoteListDiffUtilCallback(this.notes, newList))
-//        result.dispatchUpdatesTo(this)
+        val result = DiffUtil.calculateDiff(NoteListDiffUtilCallback(this.notes, newList))
         notes = newList
         notesListSearch = ArrayList(notes)
-        notifyDataSetChanged()
+        result.dispatchUpdatesTo(this)
+//        notifyDataSetChanged()
     }
 
     fun deleteItem(position: Int) {
@@ -93,7 +93,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
     }
 
     fun insertDeletedNote(deletedPosition: Int, deletedNote: Note) {
-        addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
+         addDeleteNote.insertDeletedNote(deletedPosition, deletedNote)
     }
 
     fun insertHardcoded(newList: MutableList<Note>) {
