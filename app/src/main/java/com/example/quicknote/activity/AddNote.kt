@@ -1,4 +1,4 @@
-package com.example.quicknote.Activity
+package com.example.quicknote.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -57,7 +57,8 @@ class AddNote : AppCompatActivity() {
                 title_add_note.text.toString(),
                 description_add_note.text.toString(),
                 currentDate,
-                imageToByteArray(image_note)
+                imageToByteArray(image_note),
+                false
             )
             if (note.titleNote.isEmpty()) {
                 Toast.makeText(this,

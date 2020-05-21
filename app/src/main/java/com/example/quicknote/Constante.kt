@@ -18,9 +18,12 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import java.io.*
+import java.lang.IndexOutOfBoundsException
 
 /**
  * Constant Variables.
@@ -207,6 +210,18 @@ fun checkAPIAppVersionAccesStorage(context: Context, activity: Activity, fragmen
             ActivityCompat.requestPermissions(activity, permissions, PERMISSION_CODE_ACCES_STORAGE)
         } else {
             pickImageFromGalery(fragmentActivity)
+        }
+    }
+}
+
+class WrapContentGridLayoutManager(context: Context?, spanCount: Int) :
+    GridLayoutManager(context, spanCount) {
+
+    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+        try {
+            super.onLayoutChildren(recycler, state)
+        } catch (e: IndexOutOfBoundsException) {
+            Log.d("TAG", "$e")
         }
     }
 }

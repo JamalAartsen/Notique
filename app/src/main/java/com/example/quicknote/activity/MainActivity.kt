@@ -1,4 +1,4 @@
-package com.example.quicknote.Activity
+package com.example.quicknote.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.*
 import com.example.quicknote.*
 import com.example.quicknote.model.Note
+import com.example.quicknote.model.NoteDeleted
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
@@ -145,7 +146,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     deletedNote: Note
                 ) {
                     fab.hide()
-                    noteViewModel.delete(notes[position])
+                    noteViewModel.update(Note(notes[position].id, notes[position].titleNote, notes[position].descriptionNote, notes[position].dateNote, notes[position].imageUriNote, true))
+//                    noteViewModel.delete(notes[position])
                     notes.removeAt(position)
                     noteAdapter?.deleteItem(position)
 
@@ -195,7 +197,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     position: Int,
                     note: Note
                 ) {
-                    noteViewModel.insert(note)
+                    //noteViewModel.insert(note)
+                    noteViewModel.update(Note(notes[position].id, notes[position].titleNote, notes[position].descriptionNote, notes[position].dateNote, notes[position].imageUriNote, false))
+
                 }
             })
     }
@@ -306,6 +310,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             setMessage(R.string.delete_all_notes_message)
             setCancelable(true)
             setPositiveButton(R.string.yes) { dialog, id ->
+                // TODO alleen notes die niet verwijderd zijn verwijderen.
                 noteViewModel.deleteAllNotes()
                 dialog.cancel()
             }
@@ -378,7 +383,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.nav_privacy -> {
-                val intentPrivacy = Intent(this, PrivacyPolicyAcivity::class.java)
+                val intentPrivacy = Intent(this, DeletedNotesActivity::class.java)
                 startActivity(intentPrivacy)
             }
 
@@ -390,14 +395,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 }
 
-class WrapContentGridLayoutManager(context: Context?, spanCount: Int) :
-    GridLayoutManager(context, spanCount) {
-
-    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
-        try {
-            super.onLayoutChildren(recycler, state)
-        } catch (e: IndexOutOfBoundsException) {
-            Log.d("TAG", "$e")
-        }
-    }
-}
+//class WrapContentGridLayoutManager(context: Context?, spanCount: Int) :
+//    GridLayoutManager(context, spanCount) {
+//
+//    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+//        try {
+//            super.onLayoutChildren(recycler, state)
+//        } catch (e: IndexOutOfBoundsException) {
+//            Log.d("TAG", "$e")
+//        }
+//    }
+//}

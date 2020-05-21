@@ -6,12 +6,12 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "note_table")
+@Entity(tableName = "deleted_note_table")
 data class NoteDeleted(@PrimaryKey(autoGenerate = true) val id: Int,
-                @ColumnInfo(name = "title_note") var titleNote: String,
-                @ColumnInfo(name = "description_note") var descriptionNote: String?,
-                @ColumnInfo(name = "date-note") var dateNote: String?,
-                @ColumnInfo(name = "image_note") var imageUriNote: ByteArray?): Parcelable {
+                       @ColumnInfo(name = "title_note") var titleNoteDeleted: String,
+                       @ColumnInfo(name = "description_note") var descriptionNoteDeleted: String?,
+                       @ColumnInfo(name = "date-note") var dateNoteDeleted: String?,
+                       @ColumnInfo(name = "image_note") var imageUriNoteDeleted: ByteArray?): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString().toString(),
@@ -23,10 +23,10 @@ data class NoteDeleted(@PrimaryKey(autoGenerate = true) val id: Int,
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(id)
-        parcel.writeString(titleNote)
-        parcel.writeString(descriptionNote)
-        parcel.writeString(dateNote)
-        parcel.writeByteArray(imageUriNote)
+        parcel.writeString(titleNoteDeleted)
+        parcel.writeString(descriptionNoteDeleted)
+        parcel.writeString(dateNoteDeleted)
+        parcel.writeByteArray(imageUriNoteDeleted)
     }
 
     override fun describeContents(): Int {

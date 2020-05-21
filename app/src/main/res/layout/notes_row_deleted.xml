@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
+    android:id="@+id/cardViewlayoutDeleted"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:backgroundTint="@color/background_cardview"
+    app:cardElevation="4dp"
+    android:orientation="vertical"
+    app:cardCornerRadius="3dp">
+
+    <LinearLayout
+        android:id="@+id/cardViewDeleted"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground">
+
+        <RelativeLayout
+            android:id="@+id/containerDeleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:id="@+id/linearLayoutDeleted"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:contentDescription="@string/dot"
+                    android:src="@drawable/dot" />
+
+                <TextView
+                    android:id="@+id/titleNoteDeleted"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="@string/title"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/linearLayoutDeleted"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/descriptionNoteDeleted"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="@string/description"
+                    android:textColor="@color/black"
+                    android:textSize="10sp"
+                    android:textStyle="normal" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/note_logoDeleted"
+                        android:layout_width="wrap_content"
+                        android:src="@drawable/ic_delete"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="@string/noteimage" />
+
+                    <TextView
+                        android:id="@+id/dateNoteDeleted"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:gravity="end"
+                        android:text="@string/date"
+                        android:textColor="@color/black"
+                        android:textSize="10sp"
+                        android:textStyle="italic"
+                        card_view:ignore="SmallSp" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

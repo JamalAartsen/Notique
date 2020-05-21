@@ -22,7 +22,7 @@ class NoteAdapter(var notes: MutableList<Note>, val context: Context, var onClic
     private var notesListSearch: MutableList<Note>
     private var deletedPosition: Int = 0
     private var deletedNote: Note =
-        Note(0, "", "", "", null)
+        Note(0, "", "", "", null, null)
     private var selectedItem = false
     private var hashMapSelected = HashMap<Int, Boolean>()
     private var hashMapAllPositions = HashMap<Int, Int>()

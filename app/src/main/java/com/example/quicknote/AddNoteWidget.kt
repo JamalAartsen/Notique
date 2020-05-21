@@ -6,7 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.example.quicknote.Activity.AddNote
+import com.example.quicknote.activity.AddNote
 
 /**
  * Implementation of App Widget functionality.

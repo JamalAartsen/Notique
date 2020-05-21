@@ -1,4 +1,4 @@
-package com.example.quicknote.Activity
+package com.example.quicknote.activity
 
 import android.app.Activity
 import android.content.Context
@@ -90,6 +90,7 @@ class EditNote : AppCompatActivity() {
                 dateNote = currentDate
                 imageUriNote =
                     imageToByteArray(image_note_edit)
+                isDeleted = false
             }
 
             if (note != null) {

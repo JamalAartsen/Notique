@@ -1,12 +1,14 @@
 package com.example.quicknote
 
 import androidx.lifecycle.LiveData
-import com.example.quicknote.Database.NoteDao
+import com.example.quicknote.database.NoteDao
 import com.example.quicknote.model.Note
+import com.example.quicknote.model.NoteDeleted
 
 // Isolates data. Provides clean api. Allows you to use multiple backends
 class NoteRepository(private val noteDao: NoteDao) {
     val allNote: LiveData<MutableList<Note>> = noteDao.getAllNotes()
+    val allDeletedNotes: LiveData<MutableList<Note>> = noteDao.getAllDeletedNotes()
 
     fun insert(note: Note) {
         noteDao.insert(note)
@@ -23,6 +25,10 @@ class NoteRepository(private val noteDao: NoteDao) {
     fun deleteAllNotes() {
         noteDao.deleteAllNotes()
         allNote
+    }
+
+    fun deleteAllDeletedNotes() {
+        noteDao.deleteAllDeletedNotes()
     }
 
     fun sortNotesASC() {

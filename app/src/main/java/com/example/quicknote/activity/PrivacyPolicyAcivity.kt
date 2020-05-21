@@ -1,4 +1,4 @@
-package com.example.quicknote.Activity
+package com.example.quicknote.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
